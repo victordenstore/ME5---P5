@@ -1,7 +1,7 @@
 x=0.0000042;
 
 % variables
-w=7.2*10^6;                  % System frequency in rad/s
+w=1*10^6;                  % System frequency in rad/s
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
