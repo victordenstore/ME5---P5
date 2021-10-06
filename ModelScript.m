@@ -41,25 +41,45 @@ Z_in=(Z_r*TA_matrix(1,1)+TA_matrix(1,2))/(Z_r*TA_matrix(2,1)+TA_matrix(2,2)); %E
 S_FV=Z_r*S_vI/Z_in; %Sensitivity FV
 
 
-t = linspace(0,10,1000);
-x = linspace(0,10,1000);
-alfa = -0.4;
+t = linspace(0,20*pi/w,1000);
+x = linspace(0,15*10^-3,1000);
+alfa = -40;
 V_in = zeros(1000,1);
 F = zeros(1000,1);
 P = zeros(1000,1);
 expression = zeros(1000,1000);
 
-for ko = 1:1000
-    for lim = 1:1000
+% for ko = 1:1000
+%     for lim = 1:1000
 % V_in(ko) = 150*exp(1i*w*t(ko));     %The input voltage (frequency domain/time)
-V_in(ko) = 150*sin(w*t(ko));     %The input voltage (frequency domain/time)
-F(ko) =  V_in(ko)*S_FV;            %The force output with a certain frequency
-P(ko) = F(ko)/S;                   %Pressure at the transducer face
-expression(ko,lim) = abs(P(ko)) * exp(alfa*x(lim));
+% V_in(ko) = 150*sin(w*t(ko));     %The input voltage (frequency domain/time)
+% F(ko) =  V_in(ko)*S_FV;            %The force output with a certain frequency
+% P(ko) = F(ko)/S;                   %Pressure at the transducer face
+% expression(ko,lim) = (P(ko)) * exp(alfa*x(lim));
+%     end
+% end
+V_M = 150;
+lambda = 1.5*10^-3;
+P = S_FV * V_M/S;
+damp_coeff = 400;
+exp1 = zeros(1000,1000);
+
+for to = 1:1000
+    for gi = 1:1000
+    exp1(to,gi) = P * exp(1i*w*t(gi)+1i*x(to)*2*pi/lambda - damp_coeff * x(to));
     end
 end
 
- 
-[x,t] = meshgrid(x,t);
-surf(x,t,abs(expression))
-meshc(x, t, abs(expression)); colormap jet; colorbar;
+
+
+
+
+
+
+% [x,t] = meshgrid(x,t);
+% surf(x,t,abs(expression)
+
+figure
+contourf(x, t, abs(expression), 14); colormap jet; colorbar;
+figure
+meshc(t, x, real(exp1)); colormap jet; colorbar;
