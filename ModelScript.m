@@ -42,7 +42,7 @@ S_FV=Z_r*S_vI/Z_in; %Sensitivity FV
 
 
 t = linspace(0,10*pi/w,1000);
-x = linspace(0,06*10^-3,1000);
+x = linspace(0,50*10^-3,1000);
 alfa = -40;
 V_in = zeros(1000,1);
 F = zeros(1000,1);
@@ -81,7 +81,27 @@ end
 
 figure
 contourf(t, x, real(exp1), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]');
+xlabel('time [s]'); ylabel('distance [m]'); 
 figure
 meshc(t, x, real(exp1)); colormap jet; colorbar;
 xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
+
+s = tf('s');     %initialize laplace variable
+rho_air = 1.225; %kg/m^3
+rho_oil = 0.91;
+visc_oil = 1.3; 
+R = 0.05*10^-3;
+A_b = pi*R^2;
+m_b = rho_air * (4/3) * pi * R^3;
+tf_particle = A_b/(m_b * (1i*w)^2 + 6*pi*R*rho_oil*visc_oil*(1i*w));
+
+p_grad = zeros(1000,1000);
+
+for ji = 2:999
+    for hi = 1:1000
+        p_grad(hi,ji) = exp1(hi,ji+1) - exp1(hi,ji-1);
+    end
+end
+
+tf_Vin_xout = tf_particle * p_grad;
+
