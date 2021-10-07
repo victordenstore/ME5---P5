@@ -105,3 +105,26 @@ end
 
 tf_Vin_xout = tf_particle * p_grad;
 
+x_0 = 300;
+t_0 = 100;
+x1 = zeros(300,1);
+t = linspace(0,10*pi/w,1000);
+
+time_vec = linspace(0,10*pi/(w*(1000/3.3)),300);
+
+for gif = 1:300
+    for dsf = 1:300
+    x1(gif) = p_grad(t_0+dsf,x_0+gif) * tf_particle;
+    end
+end
+
+figure
+for hello = 1:300
+plot(time_vec(hello), real(x1(hello)))
+hold on
+plot(time_vec(1:hello), real(x1(1:hello)))
+
+xlim([0 2*10^-8])
+ylim([-1*10^-8 1*10^-8])
+pause(0.05);
+end
