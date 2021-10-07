@@ -2,7 +2,7 @@ clear all; close all; clc;
 x=0.0000042;
 
 % variables
-w=7.2*10^6;                  % System frequency in rad/s
+w=2*pi*10^6;                  % System frequency in rad/s
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
@@ -41,8 +41,8 @@ Z_in=(Z_r*TA_matrix(1,1)+TA_matrix(1,2))/(Z_r*TA_matrix(2,1)+TA_matrix(2,2)); %E
 S_FV=Z_r*S_vI/Z_in; %Sensitivity FV
 
 
-t = linspace(0,20*pi/w,1000);
-x = linspace(0,15*10^-3,1000);
+t = linspace(0,10*pi/w,1000);
+x = linspace(0,06*10^-3,1000);
 alfa = -40;
 V_in = zeros(1000,1);
 F = zeros(1000,1);
@@ -61,12 +61,12 @@ expression = zeros(1000,1000);
 V_M = 150;
 lambda = 1.5*10^-3;
 P = S_FV * V_M/S;
-damp_coeff = 400;
+damp_coeff = 60;
 exp1 = zeros(1000,1000);
 
 for to = 1:1000
     for gi = 1:1000
-    exp1(to,gi) = P * exp(1i*w*t(gi)+1i*x(to)*2*pi/lambda - damp_coeff * x(to));
+    exp1(to,gi) = P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to));
     end
 end
 
@@ -80,6 +80,8 @@ end
 % surf(x,t,abs(expression)
 
 figure
-contourf(x, t, abs(expression), 14); colormap jet; colorbar;
+contourf(t, x, real(exp1), 14); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]');
 figure
 meshc(t, x, real(exp1)); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
