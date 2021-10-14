@@ -82,9 +82,16 @@ end
 
 contourf(t, x, real(exp1), 14); colormap jet; colorbar;
 xlabel('time [s]'); ylabel('distance [m]'); 
+
 figure
-meshc(t, x, real(exp1)); colormap jet; colorbar;
+time_vecs = linspace(0,10*pi/w,1000);
+
+for phil = 1:1000
+meshc(time_vecs, x, real(exp1(phil,:))); colormap jet; colorbar;
 xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
+axis([0 10*pi/w 0 50*10^-3])
+hold on
+end
 
 
 
@@ -103,7 +110,7 @@ xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
 % 
 % for ji = 2:999
 %     for hi = 1:1000
-%         p_grad(hi,ji) = exp1(hi,ji+1) - exp1(hi,ji-1);
+%         p_grad(hi,ji) = exp1(hi,ji-1) - exp1(hi,ji+1);
 %     end
 % end
 % 
