@@ -93,46 +93,18 @@ axis([0 10*pi/w 0 10*10^-3])
 % hold on
 % end
 
+%% Constants for Simulink matlab code:
+rho_p = 1.225; %Air density kg/m^3
+r = 1*10^-3; %Bubble radius m
+Vp = 4*pi/3*r^3; %Bubble volume m^3
+Mp = rho_p * Vp; %Bubble mass kg
 
+rho_l = 868; %Oil density kg/m^3
+mu = 32*10^-6*rho_l; %ISO VG32 Viscosity kg/m*s
+B = 6*pi*r*mu;
 
-% %% calculate particle motion
-% 
-% s = tf('s');     %initialize laplace variable
-% rho_air = 1.225; %kg/m^3
-% rho_oil = 0.91;
-% visc_oil = 1.3; 
-% R = 0.05*10^-3;
-% A_b = pi*R^2;
-% m_b = rho_air * (4/3) * pi * R^3;
-% tf_particle = A_b/(m_b * (1i*w)^2 + 6*pi*R*rho_oil*visc_oil*(1i*w));
-% 
-% p_grad = zeros(1000,1000);
-% 
-% for ji = 2:999
-%     for hi = 1:1000
-%         p_grad(hi,ji) = exp1(hi,ji-1) - exp1(hi,ji+1);
-%     end
-% end
-% 
-% tf_Vin_xout = tf_particle * p_grad;
-% 
-% x_0 = 300;
-% t_0 = 1;
-% x1 = zeros(300,1);
-% t = linspace(0,10*pi/w,1000);
-% x_new = zeros(201,1);
-% x_new(1) = p_grad(t_0,x_0) * tf_particle;
-% x_step = x(end)/1000;
-% s_smart = zeros(200,1);
-% 
-% for jas = 1:200
-%     
-%     s_smart(jas) = real(x_new(jas))/x_step;
-%     s_smart(jas) = round(s_smart(jas));
-%     x_new(jas+1) = p_grad(jas+1, s_smart(jas)) * tf_particle;
-% end
-% 
-% %% plot particle motion
-% time_vector = linspace(0,201*5*10^-5,201);
-% figure 
-% plot(time_vector, x_new)
+K_p = 1; %Kompressebility factor of the particle
+K_l = 1/(1.8*10^4); %Of the liquid
+
+f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
+f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
