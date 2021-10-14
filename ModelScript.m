@@ -42,7 +42,7 @@ S_FV=Z_r*S_vI/Z_in; %Sensitivity FV
 
 
 t = linspace(0,10*pi/w,1000);
-x = linspace(0,50*10^-3,1000);
+x = linspace(0,10*10^-3,1000);
 alfa = -40;
 V_in = zeros(1000,1);
 F = zeros(1000,1);
@@ -61,7 +61,7 @@ expression = zeros(1000,1000);
 V_M = 150;
 lambda = 1.5*10^-3;
 P = S_FV * V_M/S;
-damp_coeff = 60;
+damp_coeff = 4;
 exp1 = zeros(1000,1000);
 
 for to = 1:1000
@@ -86,12 +86,12 @@ xlabel('time [s]'); ylabel('distance [m]');
 figure
 time_vecs = linspace(0,10*pi/w,1000);
 
-for phil = 1:1000
-meshc(time_vecs, x, real(exp1(phil,:))); colormap jet; colorbar;
+% for phil = 1:1000
+meshc(t, x, real(exp1)); colormap jet; colorbar;
 xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
-axis([0 10*pi/w 0 50*10^-3])
-hold on
-end
+axis([0 10*pi/w 0 10*10^-3])
+% hold on
+% end
 
 
 
@@ -136,6 +136,3 @@ end
 % time_vector = linspace(0,201*5*10^-5,201);
 % figure 
 % plot(time_vector, x_new)
-%     
-%     
-%     
