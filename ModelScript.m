@@ -1,4 +1,4 @@
-clear all; close all; clc;
+ clear all; close all; clc;
 x=0.0000042;
 
 % variables
@@ -79,52 +79,56 @@ end
 % [x,t] = meshgrid(x,t);
 % surf(x,t,abs(expression)
 
-figure
+
 contourf(t, x, real(exp1), 14); colormap jet; colorbar;
 xlabel('time [s]'); ylabel('distance [m]'); 
 figure
 meshc(t, x, real(exp1)); colormap jet; colorbar;
 xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
 
-s = tf('s');     %initialize laplace variable
-rho_air = 1.225; %kg/m^3
-rho_oil = 0.91;
-visc_oil = 1.3; 
-R = 0.05*10^-3;
-A_b = pi*R^2;
-m_b = rho_air * (4/3) * pi * R^3;
-tf_particle = A_b/(m_b * (1i*w)^2 + 6*pi*R*rho_oil*visc_oil*(1i*w));
 
-p_grad = zeros(1000,1000);
 
-for ji = 2:999
-    for hi = 1:1000
-        p_grad(hi,ji) = exp1(hi,ji+1) - exp1(hi,ji-1);
-    end
-end
-
-tf_Vin_xout = tf_particle * p_grad;
-
-x_0 = 300;
-t_0 = 100;
-x1 = zeros(300,1);
-t = linspace(0,10*pi/w,1000);
-
-time_vec = linspace(0,10*pi/(w*(1000/3.3)),300);
-
-for gif = 1:300
-    for dsf = 1:300
-    x1(gif) = p_grad(t_0+dsf,x_0+gif) * tf_particle;
-    end
-end
-
-figure
-for hello = 1:300
-plot(time_vec(hello), real(x1(hello)))
-hold on
-plot(time_vec(1:hello), real(x1(1:hello)))
-
-xlim([0 2*10^-8])
-ylim([-1*10^-8 1*10^-8])
-pause(0.05);
-end
+% %% calculate particle motion
+% 
+% s = tf('s');     %initialize laplace variable
+% rho_air = 1.225; %kg/m^3
+% rho_oil = 0.91;
+% visc_oil = 1.3; 
+% R = 0.05*10^-3;
+% A_b = pi*R^2;
+% m_b = rho_air * (4/3) * pi * R^3;
+% tf_particle = A_b/(m_b * (1i*w)^2 + 6*pi*R*rho_oil*visc_oil*(1i*w));
+% 
+% p_grad = zeros(1000,1000);
+% 
+% for ji = 2:999
+%     for hi = 1:1000
+%         p_grad(hi,ji) = exp1(hi,ji+1) - exp1(hi,ji-1);
+%     end
+% end
+% 
+% tf_Vin_xout = tf_particle * p_grad;
+% 
+% x_0 = 300;
+% t_0 = 1;
+% x1 = zeros(300,1);
+% t = linspace(0,10*pi/w,1000);
+% x_new = zeros(201,1);
+% x_new(1) = p_grad(t_0,x_0) * tf_particle;
+% x_step = x(end)/1000;
+% s_smart = zeros(200,1);
+% 
+% for jas = 1:200
+%     
+%     s_smart(jas) = real(x_new(jas))/x_step;
+%     s_smart(jas) = round(s_smart(jas));
+%     x_new(jas+1) = p_grad(jas+1, s_smart(jas)) * tf_particle;
+% end
+% 
+% %% plot particle motion
+% time_vector = linspace(0,201*5*10^-5,201);
+% figure 
+% plot(time_vector, x_new)
+%     
+%     
+%     
