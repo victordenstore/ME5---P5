@@ -1,4 +1,4 @@
-function Fac = GorkovScript(c_l, rho_l, r, f_1, f_2, t, x)
+function Fac = Gorkov(c_l, rho_l, r, f_1, f_2, t, x)
 
 j = sqrt(-1);
 
