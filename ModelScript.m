@@ -61,12 +61,12 @@ expression = zeros(1000,1000);
 V_M = 150;
 lambda = 1.5*10^-3;
 P = S_FV * V_M/S;
-damp_coeff = 15;
+damp_coeff = 4;
 exp1 = zeros(1000,1000);
 
 for to = 1:1000
     for gi = 1:1000
-    exp1(to,gi) = 3.73*P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))-(3.19*P * exp(1i*w*t(gi)-1i*(-x(to))*2*pi/lambda - damp_coeff * x(to)));
+    exp1(to,gi) = P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to));
     end
 end
 
