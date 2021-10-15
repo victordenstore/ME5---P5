@@ -103,8 +103,19 @@ rho_l = 868; %Oil density kg/m^3
 mu = 32*10^-6*rho_l; %ISO VG32 Viscosity kg/m*s
 B = 6*pi*r*mu;
 
-K_p = 1; %Kompressebility factor of the particle
+K_p = 1; %Compressibility factor of the particle
 K_l = 1/(1.8*10^4); %Of the liquid
 
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
+
+x = 5*10^-2; %5cm, intial bubble placement
+v = 0;       % intital bubble velocity
+
+%% Open Simulink Model 
+open('SimulinkModel');
+
+
+%% Simulation
+Simulation = sim('SimulinkModel');
+
