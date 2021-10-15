@@ -66,7 +66,7 @@ exp1 = zeros(1000,1000);
 
 for to = 1:1000
     for gi = 1:1000
-    exp1(to,gi) = P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to));
+    exp1(to,gi) = 5.20*P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))-(-4.673*P * exp(1i*w*t(gi)-1i*(-x(to))*2*pi/lambda - damp_coeff * x(to)));
     end
 end
 
