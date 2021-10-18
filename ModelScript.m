@@ -45,9 +45,9 @@ t = linspace(0,10*pi/w,1000);
 x = linspace(0,10*10^-3,1000);
 alfa = -40;
 V_in = zeros(1000,1);
-F = zeros(1000,1);
-P = zeros(1000,1);
-expression = zeros(1000,1000);
+% F = zeros(1000,1);
+% P = zeros(1000,1);
+% expression = zeros(1000,1000);
 
 V_M = 150;
 lambda = 1.5*10^-3;
@@ -55,11 +55,11 @@ P = S_FV * V_M/S;
 damp_coeff = 4;
 exp1 = zeros(1000,1000);
 
-for to = 1:1000
-    for gi = 1:1000
-    exp1(to,gi) = 5.20*P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))-(-4.673*P * exp(1i*w*t(gi)-1i*(-x(to))*2*pi/lambda - damp_coeff * x(to)));
-    end
-end
+% for to = 1:1000
+%     for gi = 1:1000
+%     exp1(to,gi) = 5.20*P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))-(4.673*P * exp(1i*w*t(gi)-1i*(-x(to))*2*pi/lambda - damp_coeff * x(to)));
+%     end
+% end
 
 
 
@@ -71,16 +71,16 @@ end
 % surf(x,t,abs(expression)
 
 
-contourf(t, x, real(exp1), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); 
-
-figure
-time_vecs = linspace(0,10*pi/w,1000);
-
-% for phil = 1:1000
-meshc(t, x, real(exp1)); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
-axis([0 10*pi/w 0 10*10^-3])
+% contourf(t, x, real(exp1), 14); colormap jet; colorbar;
+% xlabel('time [s]'); ylabel('distance [m]'); 
+% 
+% figure
+% time_vecs = linspace(0,10*pi/w,1000);
+% 
+% % for phil = 1:1000
+% meshc(t, x, real(exp1)); colormap jet; colorbar;
+% xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
+% axis([0 10*pi/w 0 10*10^-3])
 % hold on
 % end
 
@@ -100,8 +100,21 @@ K_l = 1/(1.8*10^4); %Of the liquid
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 
+
+% a = zeros(10,1);
+% x = zeros(10,1);
+% t = linspace(0,10*2*pi/w,10);
+% v = zeros(10,1);
 x = 5*10^-2; %5cm, intial bubble placement
 v = 0;       % intital bubble velocity
+t = 0;       % initial time
+
+df = Gorkov(c, rho_l, r, f_1, f_2,w,t,x,damp_coeff,P)
+
+
+a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,t,x,damp_coeff,P),B,v)
+
+
 
 
 
