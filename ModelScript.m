@@ -49,15 +49,6 @@ F = zeros(1000,1);
 P = zeros(1000,1);
 expression = zeros(1000,1000);
 
-% for ko = 1:1000
-%     for lim = 1:1000
-% V_in(ko) = 150*exp(1i*w*t(ko));     %The input voltage (frequency domain/time)
-% V_in(ko) = 150*sin(w*t(ko));     %The input voltage (frequency domain/time)
-% F(ko) =  V_in(ko)*S_FV;            %The force output with a certain frequency
-% P(ko) = F(ko)/S;                   %Pressure at the transducer face
-% expression(ko,lim) = (P(ko)) * exp(alfa*x(lim));
-%     end
-% end
 V_M = 150;
 lambda = 1.5*10^-3;
 P = S_FV * V_M/S;
@@ -112,10 +103,13 @@ f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 x = 5*10^-2; %5cm, intial bubble placement
 v = 0;       % intital bubble velocity
 
-%% Open Simulink Model 
-open('SimulinkModel');
 
 
-%% Simulation
-Simulation = sim('SimulinkModel');
+
+% %% Open Simulink Model 
+% open('SimulinkModel');
+% 
+% 
+% %% Simulation
+% Simulation = sim('SimulinkModel');
 
