@@ -101,20 +101,26 @@ f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 
 
-% a = zeros(10,1);
-% x = zeros(10,1);
-% t = linspace(0,10*2*pi/w,10);
-% v = zeros(10,1);
-x = 5*10^-2; %5cm, intial bubble placement
-v = 0;       % intital bubble velocity
-t = 0;       % initial time
+a = zeros(10,1);
+x = zeros(11,1);
+t = linspace(0,11*2*pi/w,11)';
+v = zeros(11,1);
+x(1) = 5*10^-2; %5cm, intial bubble placement
+v(1) = 0;       % intital bubble velocity
+t(1) = 0;       % initial time
 
-df = Gorkov(c, rho_l, r, f_1, f_2,w,t,x,damp_coeff,P)
+for i = 1:10
+a(i) = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,t(i),x(i),damp_coeff,P,lambda),B,v(i));
+a_new = a(i);
+t1 = t(i);
+t2 = t(i+1);
+v(i+1) = integral(@(t) (a_new),t1,t2,'ArrayValued',true);
+v_new = v(i+1);
+x(i+1) = integral(@(t) (v_new),t1,t2,'ArrayValued',true);
+end
 
 
-a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,t,x,damp_coeff,P),B,v)
-
-
+plot(t,x)
 
 
 
