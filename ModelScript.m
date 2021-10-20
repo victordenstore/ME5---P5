@@ -27,6 +27,10 @@ Kin_Vis=32*10^-6;                % Kinematic Viscosity of the fluid (ISO VG 32)
 Vis=Kin_Vis*rho_2;               % Dynamic viscosity of the fluid
 
 Z_o=rho*v_o*S;                   % plane wave acoustic impedance of the piezoelectric plate
+c_2=3230;                        %Speed of sound in steel
+rho_3=7850;                      %Density of steel
+R=((c*rho_2)-(c_2*rho_3))/((c*rho_2)+(c_2*rho_3)); %Reflection coefficient 
+L=0.00448;                        %Lentgh of chamber
 
 %% Matricies
 TAe_matrix=[1/n n/(1i*w*C_o); -1i*w*C_o 0];          %Transducer electrical matrix
@@ -46,7 +50,7 @@ S_FV=Z_r*S_vI/Z_in; %Sensitivity FV
 %% Graphing
 
 t = linspace(0,10*pi/w,1000);
-x = linspace(0,10*10^-3,1000);
+x = linspace(0,L,1000);
 alfa = -40;
 V_in = zeros(1000,1);
 %F = zeros(1000,1);
@@ -66,7 +70,7 @@ exp1 = zeros(1000,1000);
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to));
+     exp1(to,gi) = P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))+exp1(to,gi)+R*P * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (x(to)+L));
      end
  end
 
