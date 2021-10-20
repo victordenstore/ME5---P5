@@ -91,39 +91,41 @@ xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
  %end
 
 %% Constants for Simulink matlab code:
-% rho_p = 1.225; %Air density kg/m^3
-% r = 1*10^-3; %Bubble radius m
-% Vp = 4*pi/3*r^3; %Bubble volume m^3
-% Mp = rho_p * Vp; %Bubble mass kg
-% 
-% rho_l = 868; %Oil density kg/m^3
-% mu = 32*10^-6*rho_l; %ISO VG32 Viscosity kg/m*s
-% B = 6*pi*r*mu;
-% 
-% K_p = 1; %Compressibility factor of the particle
-% K_l = 1/(1.8*10^4); %Of the liquid
-% 
-% f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
-% f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
+rho_p = 1.225; %Air density kg/m^3
+r = 1*10^-3; %Bubble radius m
+Vp = 4*pi/3*r^3; %Bubble volume m^3
+Mp = rho_p * Vp; %Bubble mass kg
+
+rho_l = 868; %Oil density kg/m^3
+mu = 32*10^-6*rho_l; %ISO VG32 Viscosity kg/m*s
+B = 6*pi*r*mu;
+
+K_p = 1; %Compressibility factor of the particle
+K_l = 1/(1.8*10^4); %Of the liquid
+
+f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
+f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 
 
-%a = zeros(10,1);
-%x = zeros(11,1);
-%t = linspace(0,11*2*pi/w,11)';
-%v = zeros(11,1);
-%x(1) = 5*10^-2; %5cm, intial bubble placement
-%v(1) = 0;       % intital bubble velocity
-%t(1) = 0;       % initial time
+a = zeros(10,1);
+x = zeros(11,1);
+t = linspace(0,11*2*pi/w,11)';
+v = zeros(11,1);
+T = 1/f;
+x(1) = 5*10^-2; %5cm, intial bubble placement
+v(1) = 0;       % intital bubble velocity
+t(1) = 0;       % initial time
+a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
 
-%for i = 1:10
-%a(i) = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,t(i),x(i),damp_coeff,P,lambda),B,v(i));
-%a_new = a(i);
-%t1 = t(i);
-%t2 = t(i+1);
-%v(i+1) = integral(@(t) (a_new),t1,t2,'ArrayValued',true);
-%v_new = v(i+1);
-%x(i+1) = integral(@(t) (v_new),t1,t2,'ArrayValued',true);
-%end
+% for i = 1:10
+% a(i) = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(i),damp_coeff,P),B,v(i));
+% a_new = a(i);
+% t1 = t(i);
+% t2 = t(i+1);
+% v(i+1) = integral(@(t) (a_new),t1,t2,'ArrayValued',true);
+% v_new = v(i+1);
+% x(i+1) = integral(@(t) (v_new),t1,t2,'ArrayValued',true);
+% end
 
 
 %plot(t,x)
