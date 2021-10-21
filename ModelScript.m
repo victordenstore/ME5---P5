@@ -59,9 +59,10 @@ V_in = zeros(1000,1);
 
 %% Solving for Pressure at transducer face
 
-V_M = 150;
+V_M = 150*sin(w*t);
 lambda =c/f;
-P = S_FV * V_M/S;
+F_surface = V_M * S_FV;
+P_surface = F_surface/S_a;
 
 %% Solving for Pressure field
 
@@ -70,7 +71,7 @@ exp1 = zeros(1000,1000);
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))+exp1(to,gi)+R*P * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (x(to)+L));
+     exp1(to,gi) = P_surface(to) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))+exp1(to,gi)+R*P_surface(to) * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (x(to)+L));
      end
  end
 
@@ -107,15 +108,23 @@ f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 
 
-a = zeros(10,1);
-x = zeros(11,1);
-t = linspace(0,11*2*pi/w,11)';
+% a = zeros(10,1);
+% x = zeros(11,1);
+% t = linspace(0,11*2*pi/w,11)';
 v = zeros(11,1);
 T = 1/f;
-x(1) = 5*10^-2; %5cm, intial bubble placement
-v(1) = 0;       % intital bubble velocity
-t(1) = 0;       % initial time
-a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
+x = 0; %5cm, intial bubble placement
+v = 0;       % intital bubble velocity
+t = 0;       % initial time
+% a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
+
+a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface(2)),B,v)
+t1 = 0;
+t2 = T;
+v= integral(@(t) (a),t1,t2,'ArrayValued',true)
+v = abs(v)
+
+
 
 % for i = 1:10
 % a(i) = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(i),damp_coeff,P),B,v(i));
@@ -127,9 +136,9 @@ a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
 % x(i+1) = integral(@(t) (v_new),t1,t2,'ArrayValued',true);
 % end
 
-
-%plot(t,x)
-
+% figure
+% plot(t,x)
+% 
 
 
 
