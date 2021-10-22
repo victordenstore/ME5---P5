@@ -2,7 +2,8 @@
 x=0.0000042;
 
 %% Initial Variables
-w=2*pi*10^6;                     % System frequency in rad/s
+f = 1*10^6;
+w=2*pi*f;                     % System frequency in rad/s
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
@@ -13,8 +14,7 @@ s_33=14.2*10^-12;                % Elastic compliance coefficient
 epsilon_0=8.854*10^-12;          % Vacuum permitivity
 epsilon_33=1200*epsilon_0;       % relativity Permativity
 Beta_33= epsilon_0/epsilon_33;   % the dielectric impermeability of the plate at constant strain,
-c=1300;                          % compresisonal wave speed in fluid
-f=w/(2*pi);                      % System Angular frequency 1/s
+c=1300;                          % compresisonal wave speed in fluid                     
 h_33= d_33/(s_33*epsilon_33);    % Piezoelectric stiffness constant for the plate
 v_o=sqrt(c_33/rho);              % compressional wave speed from piezoelectric
 k=w/v_o;                         % wave number for the peizoelectric plate
