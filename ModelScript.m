@@ -59,7 +59,7 @@ V_in = zeros(1000,1);
 
 %% Solving for Pressure at transducer face
 
-V_M = 150*sin(w*t);
+V_M = 150;
 lambda =c/f;
 F_surface = V_M * S_FV;
 P_surface = F_surface/S_a;
@@ -71,7 +71,7 @@ exp1 = zeros(1000,1000);
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P_surface(to) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))+exp1(to,gi)+R*P_surface(to) * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (x(to)+L));
+     exp1(to,gi) = P_surface * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))+exp1(to,gi)+R*P_surface * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (x(to)+L));
      end
  end
 
@@ -93,7 +93,7 @@ xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
 
 %% Constants for Simulink matlab code:
 rho_p = 1.225; %Air density kg/m^3
-r = 1*10^-3; %Bubble radius m
+r = 1000; %Bubble radius m
 Vp = 4*pi/3*r^3; %Bubble volume m^3
 Mp = rho_p * Vp; %Bubble mass kg
 
@@ -106,6 +106,7 @@ K_l = 1/(1.8*10^4); %Of the liquid
 
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
+P = P_surface;
 
 
 % a = zeros(10,1);
@@ -114,11 +115,15 @@ f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 v = zeros(11,1);
 T = 1/f;
 x = 0; %5cm, intial bubble placement
-v = 0;       % intital bubble velocity
+v = 25;       % intital bubble velocity
 t = 0;       % initial time
 % a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
+acoustic_contrast_factor = (5*rho_p-2*rho_l)/(2*rho_p+rho_l) - (K_p/K_l)
+Eac = P_surface*2 / (4*rho_l*c^2);
 
-a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface(2)),B,v)
+
+%a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
+a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P,k),B,v)
 t1 = 0;
 t2 = T;
 v= integral(@(t) (a),t1,t2,'ArrayValued',true)
