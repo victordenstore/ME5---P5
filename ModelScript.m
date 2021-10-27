@@ -49,7 +49,7 @@ Z_m=rho_3*c_2*S_m;                   % The acoustic impedance of the coating mat
 Kin_Vis=32*10^-6;                % Kinematic Viscosity of the fluid (ISO VG 32)
 Vis=Kin_Vis*rho_2;               % Dynamic viscosity of the fluid
 R=((c*rho_2)-(c_2*rho_3))/((c*rho_2)+(c_2*rho_3)); %Reflection coefficient 
-L=0.00448;                                         %Lentgh of chamber
+L=0.04485;                                         %Lentgh of chamber
 
 
 %% Matricies
@@ -96,7 +96,7 @@ shit = zeros(1000,1)
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P_surface*(5.0907+1) * imag(exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to)))+exp1(to,gi)-5.5778*P_surface * imag(exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (abs(x(to)-L))));
+     exp1(to,gi) = P_surface*(4.2736+1) * imag(exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to)))+exp1(to,gi)-4.8295*P_surface * imag(exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (abs(x(to)-L))));
      
      end
  end
