@@ -1,45 +1,69 @@
  clear all; close all; clc;
-x=0.0000042;
 
 %% Initial Variables
-f = 1*10^6;
-w=2*pi*f;                     % System frequency in rad/s
-a=2.5*10^-3;                     % Radius of the piezoelectric plate
-rho=7.8*10^3;                    % Piezoelectric plate density
-c_33=16.6*10^10;                 % Elastic constant of the plate
-d=2*10^-3;                       % plate thickness
-Z_b=x*w;                         % Acoustic impedance of the backing plate (this is a function of frequency)
-d_33=265*10^-12;                 % Piezoelectric charge coefficient
-s_33=14.2*10^-12;                % Elastic compliance coefficient
-epsilon_0=8.854*10^-12;          % Vacuum permitivity
-epsilon_33=1200*epsilon_0;       % relativity Permativity
-Beta_33= epsilon_0/epsilon_33;   % the dielectric impermeability of the plate at constant strain,
-c=1300;                          % compresisonal wave speed in fluid                     
-h_33= d_33/(s_33*epsilon_33);    % Piezoelectric stiffness constant for the plate
-v_o=sqrt(c_33/rho);              % compressional wave speed from piezoelectric
-k=w/v_o;                         % wave number for the peizoelectric plate
-S=pi*a^2;                        % Piezoelectric surface area
-C_o=S/(Beta_33*d);               % the clamped capacitance of the plate
-n=h_33*C_o;                      % A given constant
-S_a=S;                           % effective face area of the transducer
-rho_2=857;                       % density of the fluid
+f = 1*10^6;                      % system frequency in Hz
+w=2*pi*f;                        % System frequency in rad/s
+
+%% Piezoelectric constants
+
+r_p=2.5*10^-3;                     % Radius of the piezoelectric plate - Found from CAD model
+rho=7.8*10^3;                      % Piezoelectric plate density - Found from data sheet
+d=2*10^-3;                         % Piezoelectric plate thickness - found from data sheet
+S=pi*r_p^2;                        % Piezoelectric surface area - area of a circle due to circular peizoelectric disk face
+
+c_33=16.6*10^10;                   % Elastic constant of the plate - found from source (victor found - please put it in when editing)
+d_33=265*10^-12;                   % Piezoelectric charge coefficient - found from source -||-
+s_33=14.2*10^-12;                  % Elastic compliance coefficient - found from source -||-
+epsilon_0=8.854*10^-12;            % Vacuum permitivity - found from source -||-
+epsilon_33=1200*epsilon_0;         % relativity Permativity - found from source -||-
+Beta_33= epsilon_0/epsilon_33;     % the dielectric impermeability of the plate at constant strain - found from source -||-
+h_33= d_33/(s_33*epsilon_33);      % Piezoelectric stiffness constant for the plate - found from source -||-
+v_o=sqrt(c_33/rho);                % compressional wave speed from piezoelectric - found from source -||-
+
+%%TAe calculated inputs
+C_o=S/(Beta_33*d);                 % the clamped capacitance of the plate - Found from NDE book
+n=h_33*C_o;                        % A given constant
+
+%TAa calculated inputs
+x=0.0000042;                       % Random variable to establish acoustic backing material relationship
+Z_b=x*w;                           % Acoustic impedance of the backing plate (this is a function of frequency)  
+k=w/v_o;                           % wave number for the peizoelectric plate - found from NDE book
+
+
+%% Acoustic impedance calculations
+Z_o=rho*v_o*S;                       % plane wave acoustic impedance of the piezoelectric plate
+
+S_a=S;                               % effective face area of the transducer
+rho_2=857;                           % density of the fluid ISO VG 32
+c=1300;                              % compresisonal wave speed in fluid 
+Z_r=S_a*c*rho_2;                     % Acoustic radiation impedance 
+
+c_2=3230;                            % Speed of sound in steel
+rho_3=7850;                          % Density of steel
+k_2=w/c_2;                           % wave number of the coating material of the transducer source
+d_2=0.5*10^3;                        % thickness of the coating material of the transducer source
+S_m=(8.5*10^-3)^2*pi;                % Face area of the coating material fo the transducer soruce
+Z_m=rho_3*c_2*S_m;                   % The acoustic impedance of the coating material of the transducer source
+
+
 Kin_Vis=32*10^-6;                % Kinematic Viscosity of the fluid (ISO VG 32)
 Vis=Kin_Vis*rho_2;               % Dynamic viscosity of the fluid
-
-Z_o=rho*v_o*S;                   % plane wave acoustic impedance of the piezoelectric plate
-c_2=3230;                        %Speed of sound in steel
-rho_3=7850;                      %Density of steel
 R=((c*rho_2)-(c_2*rho_3))/((c*rho_2)+(c_2*rho_3)); %Reflection coefficient 
-L=0.00448;                        %Lentgh of chamber
+L=0.00448;                                         %Lentgh of chamber
+
 
 %% Matricies
-TAe_matrix=[1/n n/(1i*w*C_o); -1i*w*C_o 0];          %Transducer electrical matrix
+TAe_matrix=[1/n n/(1i*w*C_o); -1i*w*C_o 0];                                                                              %Transducer electrical matrix
+
 TAa_matrix=(1/(Z_b-1i*Z_o*tan(k*d/2)))*[Z_b+1i*Z_o*cot(k*d) (Z_o)^2+1i*Z_o*Z_b*cot(k*d); 1 Z_b-2*1i*Z_o*tan(k*d/2)];     %Transducer acoustic matrix
 
-TA_matrix=TAe_matrix*TAa_matrix; %Sittig model matrix
+TAl_matrix=[cos(k_2*d_2) -1i*Z_m*sin(k_2*d_2); (-1i*sin(k_2*d_2))/Z_m cos(k_2*d_2)];                                     %Transducer coating material matrix
 
-%% equations for acoustic Impedance
-Z_r=S_a*c*rho_2;         % Acoustic radiation impedance - just in case we want to put in the Ka condition later.
+
+
+TA_matrix=TAe_matrix*TAa_matrix*TAl_matrix;                                                                              %Sittig model matrix
+
+%% equations for Sensitvities
 
 S_vI=1/(Z_r*TA_matrix(2,1)+TA_matrix(2,2)); %Sensitivity for vI.
 
