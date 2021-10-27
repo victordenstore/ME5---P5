@@ -149,7 +149,7 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
-a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P,k),B,v)
+a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k),B,v)
 t1 = 0;
 t2 = T;
 v= integral(@(t) (a),t1,t2,'ArrayValued',true)
