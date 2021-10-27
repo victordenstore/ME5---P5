@@ -6,7 +6,7 @@ x=0.0000042;
 
 %% intialization
 f = 1*10^6;
-w=linspace(1,2.5*pi*f,100000);                     % System frequency in rad/s    
+w=linspace(1,2.5*pi*f,10000); % System frequency in rad/s, w=linspace(2.3064*pi*f,2.3068*pi*f,10000); 
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
@@ -75,13 +75,17 @@ Z_Ae_in(i) = (Z_Aa_r*T_A(1,1) + T_A(1,2))/(Z_Aa_r*T_A(2,1) + T_A(2,2));
 S_FV(i) = Z_Aa_r * S_A_vl(i)/Z_Ae_in(i);
 end
 
+phase = rad2deg(angle(S_FV));
+
 S_FV = 20*log10(abs(S_FV))
 %% figure
 
 tiledlayout(2,1);
+
 nexttile
 plot(w,S_FV)
-phase = rad2deg(angle(S_FV));
 nexttile
 plot(w,phase)
+
+
 
