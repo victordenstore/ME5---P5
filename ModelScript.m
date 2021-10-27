@@ -41,8 +41,8 @@ Z_r=S_a*c*rho_2;                     % Acoustic radiation impedance
 c_2=3230;                            % Speed of sound in steel
 rho_3=7850;                          % Density of steel
 k_2=w/c_2;                           % wave number of the coating material of the transducer source
-d_2=0.5*10^3;                        % thickness of the coating material of the transducer source
-S_m=(8.5*10^-3)^2*pi;                % Face area of the coating material fo the transducer soruce
+d_2=0.5*10^-3;                       % thickness of the coating material of the transducer source
+S_m=(4.5*10^-3)^2*pi;                % Face area of the coating material fo the transducer soruce
 Z_m=rho_3*c_2*S_m;                   % The acoustic impedance of the coating material of the transducer source
 
 
