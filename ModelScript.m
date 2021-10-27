@@ -96,7 +96,7 @@ shit = zeros(1000,1);
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P_surface*(4.2736+1) * imag(exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to)))+exp1(to,gi)-4.8295*P_surface * imag(exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (abs(x(to)-L))));
+     exp1(to,gi) = P_surface*(4.2736+1) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)*exp(- damp_coeff * x(to))-4.8295*P_surface * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda)*exp(- damp_coeff * (abs(x(to)-L)));
      
      end
  end
@@ -149,7 +149,7 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
-a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P,k),B,v)
+a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k),B,v)
 t1 = 0;
 t2 = T;
 v= integral(@(t) (a),t1,t2,'ArrayValued',true)
