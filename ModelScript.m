@@ -96,7 +96,7 @@ shit = zeros(1000,1);
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P_surface*(4.2736+1) * imag(exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to)))+exp1(to,gi)-4.8295*P_surface * imag(exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (abs(x(to)-L))));
+     exp1(to,gi) = P_surface*(4.2736+1) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)*exp(- damp_coeff * x(to))-4.8295*P_surface * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda)*exp(- damp_coeff * (abs(x(to)-L)));
      
      end
  end
