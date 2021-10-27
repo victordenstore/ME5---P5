@@ -82,7 +82,7 @@ V_in = zeros(1000,1);
 %expression = zeros(1000,1000);
 
 %% Solving for Pressure at transducer face
-
+S_FV = abs(S_FV)*exp(1i*atan((imag(S_FV)/real(S_FV))))
 V_M = 150;
 lambda =c/f;
 F_surface = V_M * S_FV;
@@ -92,10 +92,12 @@ P_surface = F_surface/S_a;
 
 damp_coeff =(2*Kin_Vis*w^2)/(3*c^3);
 exp1 = zeros(1000,1000);
+shit = zeros(1000,1)
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P_surface * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to))+exp1(to,gi)+R*P_surface * exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (x(to)+L));
+     exp1(to,gi) = P_surface * imag(exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda - damp_coeff * x(to)))+exp1(to,gi)+R*P_surface * imag(exp(1i*w*t(gi)+1i*pi-1i*(-x(to))*2*pi/lambda - damp_coeff * (x(to)+L)));
+     
      end
  end
 
