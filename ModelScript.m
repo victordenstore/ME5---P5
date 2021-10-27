@@ -92,7 +92,7 @@ P_surface = F_surface/S_a;
 
 damp_coeff =(2*Kin_Vis*w^2)/(3*c^3);
 exp1 = zeros(1000,1000);
-shit = zeros(1000,1)
+shit = zeros(1000,1);
 
  for to = 1:1000
      for gi = 1:1000
