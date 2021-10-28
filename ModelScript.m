@@ -96,7 +96,7 @@ shit = zeros(1000,1);
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P_surface*(4.2736+1) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)*exp(- damp_coeff * x(to))-4.8295*P_surface * exp(1i*w*t(gi)-1i*(-x(to))*2*pi/lambda)*exp(- damp_coeff * (abs(x(to)-L)));
+     exp1(to,gi) = P_surface*(4.2736+1) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)*exp(- damp_coeff * x(to))-4.8295*P_surface * exp(1i*w*t(gi)-1i*(-x(to))*2*pi/lambda)*exp(- damp_coeff * (L-x(to)));
      
      end
  end
@@ -133,6 +133,8 @@ K_l = 1/(1.8*10^4); %Of the liquid
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 P = P_surface;
+P_s=P_surface*(1+4.2736);
+P_s2=-4.8295*P_surface;
 
 
 % a = zeros(10,1);
@@ -149,7 +151,7 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
-a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k),B,v)
+a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k,T,damp_coeff,lambda,L,P_s,P_s2),B,v)
 t1 = 0;
 t2 = T;
 v= integral(@(t) (a),t1,t2,'ArrayValued',true)
