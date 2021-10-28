@@ -142,8 +142,8 @@ P_s2=-4.8295*P_surface;
 % t = linspace(0,11*2*pi/w,11)';
 v = zeros(11,1);
 T = 1/f;
-x = 0; %5cm, intial bubble placement
-v = 25;       % intital bubble velocity
+x = 0.0013*30+0.0013/8; %5cm, intial bubble placement
+v = 0;       % intital bubble velocity
 t = 0;       % initial time
 % a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
 acoustic_contrast_factor = (5*rho_p-2*rho_l)/(2*rho_p+rho_l) - (K_p/K_l)
@@ -151,11 +151,8 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
-a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k,T,damp_coeff,lambda,L,P_s,P_s2),B,v)
-t1 = 0;
-t2 = T;
-v= integral(@(t) (a),t1,t2,'ArrayValued',true)
-v = abs(v)
+v = EOM_Particle(Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k,T,damp_coeff,lambda,L,P_s,P_s2),B)
+
 
 
 

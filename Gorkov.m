@@ -5,7 +5,7 @@
 % end
          function Fac = Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k,T,damp_coeff,lambda,L,P_s,P_s2)
 
-
+syms x
 
 grad_p_in = -1/2*1i/T*(exp(4*x*(1i*pi+damp_coeff*lambda)/lambda)*(-4.8295*P_surface)^2 ...
 -2*exp((damp_coeff*lambda*L+4*1i*pi*x+2*damp_coeff*x*lambda)/lambda)*(-4.8295*P_surface) ...
@@ -31,7 +31,7 @@ grad_v_in = -1/2/T*(8*1i*pi^2*exp((-2*1i*lambda*T*w+damp_coeff*lambda*L+4*1i*pi*
     +1i*exp(2*(-1i*lambda*T*w+2*1i*pi*x+2*damp_coeff*x*lambda)/lambda)*P_s2^2*damp_coeff^2*lambda^2-4*1i ...
     *pi^2*exp(2*(-1i*lambda*T*w+damp_coeff*lambda*L+2*1i*pi*x)/lambda)*P_s^2-4*exp(2*(damp_coeff*lambda ...
     *L+2*1i*pi*x)/lambda)*pi*P_s^2*damp_coeff*lambda)*exp(-2*L*damp_coeff-2*damp_coeff*x)/w^3/lambda^2/rho_l^2;
-Fac = 4*pi/3 * r^3 * (f_1 * 1/(2*rho_l*c^2) * grad_p_in - f_2 * 3/4*rho_l*grad_v_in);
-
+Uac = 4*pi/3 * r^3 * (f_1 * 1/(2*rho_l*c^2) * real(grad_p_in) - f_2 * 3/4*rho_l*real(grad_v_in));
+Fac=diff(Uac,x);
 
 end
