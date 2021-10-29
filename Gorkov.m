@@ -34,4 +34,21 @@ grad_v_in = -1/2/T*(8*1i*pi^2*exp((-2*1i*lambda*T*w+damp_coeff*lambda*L+4*1i*pi*
 Uac = 4*pi/3 * r^3 * (f_1 * 1/(2*rho_l*c^2) * real(grad_p_in) - f_2 * 3/4*rho_l*real(grad_v_in));
 Fac=diff(Uac,x);
 
-end
+         end
+
+%          I tried to calculate everything in matlab, very speed
+%          function Fac = Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,T,damp_coeff,lambda,L)
+% syms x
+% syms t
+% grad_p_in = 1/T*int((P_surface*(1+4.2736)*sin(-w*t)*sin(2*pi*x/lambda)*exp(-x*damp_coeff)...
+%     -4.8295*P_surface*sin(-w*t)*sin(2*pi*x/lambda)*exp(-(L-x)*damp_coeff))^2,t,0,T);
+% 
+% v_in = -1i/(w*rho_l)*diff(P_surface*(1+4.2736)*sin(-w*t)*sin(2*pi*x/lambda)*exp(-x*damp_coeff)...
+%     -4.8295*P_surface*sin(-w*t)*sin(2*pi*(x)/lambda)*exp(-(L-x)*damp_coeff),x);
+% 
+% grad_v_in = 1/T*int((v_in)^2,t,0,T);
+% 
+% Uac = 4*pi/3 * r^3 * (f_1 * 1/(2*rho_l*c^2) * grad_p_in - f_2 * 3/4*rho_l*grad_v_in);
+% Fac=diff(Uac,x);
+% 
+% end
