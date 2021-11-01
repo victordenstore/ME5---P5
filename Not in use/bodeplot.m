@@ -6,7 +6,7 @@ x=0.0000042;
 
 %% intialization
 f = 1*10^6;
-w=linspace(1,2.5*pi*f,10000); % System frequency in rad/s, w=linspace(2.3064*pi*f,2.3068*pi*f,10000); 
+w=linspace(1,4*pi*f,10000); % System frequency in rad/s, w=linspace(2.3064*pi*f,2.3068*pi*f,10000); 
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
@@ -37,8 +37,8 @@ L=0.00448;
 
 c_2 = 3230;                      % wave speed in steel
 k_2=w/c_2                       % wave number of the coating material of the transducer source
-d_2=0.5*10^3;                    % thickness of the coating material of the transducer source
-S_m=(4.5*10^3)^2*pi;             % Face area of the coating material fo the transducer soruce
+d_2=0.5*10^-3;                    % thickness of the coating material of the transducer source
+S_m=(4.5*10^-3)^2*pi;             % Face area of the coating material fo the transducer soruce
 Z_m=rho_3*c_2*S_m;               % The acoustic impedance of the coating material of the transducer source
 %% TA Matrix
 T_A_11 = zeros(length(w),1);
@@ -83,9 +83,11 @@ S_FV = 20*log10(abs(S_FV))
 tiledlayout(2,1);
 
 nexttile
-plot(w,S_FV)
+plot(w/(2*pi),S_FV,'g')
 nexttile
-plot(w,phase)
+plot(w/(2*pi),phase)
+
+
 
 
 
