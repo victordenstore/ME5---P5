@@ -127,8 +127,8 @@ rho_l = 868; %Oil density kg/m^3
 mu = 32*10^-6*rho_l; %ISO VG32 Viscosity kg/m*s
 B = 6*pi*r*mu;
 
-K_p = 1; %Compressibility factor of the particle
-K_l = 1/(1.8*10^4); %Of the liquid
+K_p = 1/(101*10^3); %Compressibility factor of the particle
+K_l = 1/(1.8*10^9); %Of the liquid
 
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
@@ -141,7 +141,7 @@ f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 % t = linspace(0,11*2*pi/w,11)';
 v = zeros(11,1);
 T = 1/f;
-x = 0.0013*30-0.0013/8; %5cm, intial bubble placement
+x = 0.0013/8; %5cm, intial bubble placement
 v = 0;       % intital bubble velocity
 t = 0;       % initial time
 % a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));

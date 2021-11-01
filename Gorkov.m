@@ -40,9 +40,11 @@
          function Fac = Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,T,damp_coeff,lambda,L)
 syms x
 syms t
-grad_p_in = 1/T*int((P_surface*(4.2736+1) * exp(1i*w*t-1i*x*2*pi/lambda)*exp(- damp_coeff * x)-4.8295*P_surface * exp(1i*w*t-1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x)))^2,t,0,T);
+grad_p_in = 1/T*int((P_surface*(4.2736+1) * exp(-1i*w*t+1i*x*2*pi/lambda)*exp(- damp_coeff * x)...
+    -4.8295*P_surface * exp(-1i*w*t+1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x)))^2,t,0,T);
 
-v_in = -1i/(w*rho_l)*diff(P_surface*(4.2736+1) * exp(1i*w*t-1i*x*2*pi/lambda)*exp(- damp_coeff * x)-4.8295*P_surface * exp(1i*w*t-1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x)),x);
+v_in = -1i/(w*rho_l)*diff(P_surface*(4.2736+1) * exp(1i*w*t-1i*x*2*pi/lambda)*exp(- damp_coeff ...
+    * x)-4.8295*P_surface * exp(1i*w*t-1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x)),x);
 
 grad_v_in = 1/T*int((v_in)^2,t,0,T);
 
