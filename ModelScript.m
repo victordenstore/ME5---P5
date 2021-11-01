@@ -119,7 +119,7 @@ xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
 
 %% Constants for Simulink matlab code:
 rho_p = 1.225; %Air density kg/m^3
-r = 1000; %Bubble radius m
+r = 0.0001; %Bubble radius m
 Vp = 4*pi/3*r^3; %Bubble volume m^3
 Mp = rho_p * Vp; %Bubble mass kg
 
@@ -132,9 +132,8 @@ K_l = 1/(1.8*10^4); %Of the liquid
 
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
-P = P_surface;
-P_s=P_surface*(1+4.2736);
-P_s2=-4.8295*P_surface;
+
+
 
 
 % a = zeros(10,1);
@@ -142,7 +141,7 @@ P_s2=-4.8295*P_surface;
 % t = linspace(0,11*2*pi/w,11)';
 v = zeros(11,1);
 T = 1/f;
-x = 0.0013*30+0.0013/8; %5cm, intial bubble placement
+x = 0.0013*30-0.0013/8; %5cm, intial bubble placement
 v = 0;       % intital bubble velocity
 t = 0;       % initial time
 % a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
@@ -151,7 +150,7 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
-v = EOM_Particle(Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,k,T,damp_coeff,lambda,L,P_s,P_s2),B)
+v = EOM_Particle(Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,T,damp_coeff,lambda,L),B)
 
 
 
