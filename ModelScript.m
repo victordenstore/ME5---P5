@@ -150,24 +150,24 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
-v = EOM_Particle(Gorkov(c, rho_l, r, f_1, f_2,w,x,P_surface,T,damp_coeff,lambda,L),B)
 
+velocities = zeros(1000,1);
+v = EOM_Particle(Gorkov,B)
 
-
-
-% for i = 1:10
-% a(i) = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(i),damp_coeff,P),B,v(i));
-% a_new = a(i);
-% t1 = t(i);
-% t2 = t(i+1);
-% v(i+1) = integral(@(t) (a_new),t1,t2,'ArrayValued',true);
-% v_new = v(i+1);
-% x(i+1) = integral(@(t) (v_new),t1,t2,'ArrayValued',true);
+% for i = 1:length(velocities)
+%     x = linspace(0.000013,0.05,length(velocities));
+%     x = x(i);
+% v = EOM_Particle(Gorkov,B);
+% vnew = subs(v)
+% v_double = double(vnew)
+% velocities(i) = real(v_double);
 % end
-
-% figure
-% plot(t,x)
 % 
+% x = linspace(0.000013,0.05,length(velocities));
+% 
+% figure
+% plot(x',velocities)
+
 
 
 
