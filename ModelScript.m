@@ -96,7 +96,8 @@ shit = zeros(1000,1);
 
  for to = 1:1000
      for gi = 1:1000
-     exp1(to,gi) = P_surface*(4.2736+1) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)*exp(- damp_coeff * x(to))-4.8295*P_surface * exp(1i*w*t(gi)-1i*(-x(to))*2*pi/lambda)*exp(- damp_coeff * (L-x(to)));
+     exp1(to,gi) = P_surface*(4.2736+1) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)*exp(- damp_coeff * x(to)) ...
+         - 4.8295*P_surface * exp(1i*w*t(gi)+1i*(x(to))*2*pi/lambda)*exp(- damp_coeff * (L-x(to)));
      
      end
  end
@@ -119,8 +120,8 @@ xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
 
 %% Constants for Simulink matlab code:
 rho_p = 1.225; %Air density kg/m^3
-r = 0.0001; %Bubble radius m
-Vp = 4*pi/3*r^3; %Bubble volume m^3
+r = 80*10^-6; %Bubble radius m
+Vp = (4*pi/3)*r^3; %Bubble volume m^3
 Mp = rho_p * Vp; %Bubble mass kg
 
 rho_l = 868; %Oil density kg/m^3
@@ -151,22 +152,22 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
 
-velocities = zeros(1000,1);
+velocities = zeros(100,1);
 v = EOM_Particle(Gorkov,B)
 
-% for i = 1:length(velocities)
-%     x = linspace(0.000013,0.05,length(velocities));
-%     x = x(i);
-% v = EOM_Particle(Gorkov,B);
-% vnew = subs(v)
-% v_double = double(vnew)
-% velocities(i) = real(v_double);
-% end
-% 
-% x = linspace(0.000013,0.05,length(velocities));
-% 
-% figure
-% plot(x',velocities)
+for i = 1:length(velocities)
+    x = linspace(0.000013,0.05,length(velocities));
+    x = x(i);
+v = EOM_Particle(Gorkov,B);
+vnew = subs(v)
+v_double = double(vnew)
+velocities(i) = real(v_double);
+end
+
+x = linspace(0.000013,0.05,length(velocities));
+
+figure
+plot(x',velocities)
 
 
 

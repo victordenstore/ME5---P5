@@ -38,17 +38,26 @@
 
 %          I tried to calculate everything in matlab, very speed
          function Fac = Gorkov
+         
 syms x t T P_surface lambda damp_coeff w L rho_l c f_1 f_2 r real
+ p_mean_squared = 1/T * int((P_surface*(4.2736+1)*cos(x*2*pi/lambda-w*t) ...
+     - 4.8295*P_surface * cos(w*t + x*2*pi/lambda))^2,t,0,T);
+ v_in = -1i/(w*rho_l)*diff(P_surface*(4.2736+1)*cos(x*2*pi/lambda-w*t) ...
+     - 4.8295*P_surface * cos(w*t + x*2*pi/lambda),x);
+ grad_v_in = 1/T*int((v_in)^2,t,0,T);
+    
 
-grad_p_in = 1/T*int((real(P_surface*(4.2736+1) * exp(-1i*w*t+1i*x*2*pi/lambda)*exp(- damp_coeff * x)...
-    -4.8295*P_surface * exp(-1i*w*t+1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x))))^2,t,0,T);
+ 
+ 
+% grad_p_in = 1/T*int((real(P_surface*(4.2736+1) * exp(-1i*w*t+1i*x*2*pi/lambda)*exp(- damp_coeff * x)...
+%     - 4.8295*P_surface * exp(1i*w*t-1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x))))^2,t,0,T);
+% 
+% v_in = -1i/(w*rho_l)*diff(real(P_surface*(4.2736+1) * exp(1i*w*t-1i*x*2*pi/lambda)*exp(- damp_coeff * x) ...
+%     - 4.8295*P_surface * exp(1i*w*t-1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x))),x);
+% 
+% grad_v_in = 1/T*int((v_in)^2,t,0,T);
 
-v_in = -1i/(w*rho_l)*diff(real(P_surface*(4.2736+1) * exp(1i*w*t-1i*x*2*pi/lambda)*exp(- damp_coeff ...
-    * x)-4.8295*P_surface * exp(1i*w*t-1i*(-x)*2*pi/lambda)*exp(- damp_coeff * (L-x))),x);
-
-grad_v_in = 1/T*int((v_in)^2,t,0,T);
-
-Uac = 4*pi/3 * r^3 * (f_1 * 1/(2*rho_l*c^2) * grad_p_in - f_2 * 3/4*rho_l*grad_v_in);
-Fac=real(diff(Uac,x));
+Uac = 4*pi/3 * r^3 * (f_1 * 1/(2*rho_l*c^2) * p_mean_squared - f_2 * 3/4*rho_l*grad_v_in);
+Fac= real(diff(Uac,x));
 
 end
