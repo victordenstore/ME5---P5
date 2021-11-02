@@ -86,7 +86,7 @@ S_FV = abs(S_FV)*exp(1i*atan((imag(S_FV)/real(S_FV))))
 V_M = 150;
 lambda =c/f;
 F_surface = V_M * S_FV;
-P_surface = F_surface/S_a;
+P_surface = F_surface/(S_a*35);
 
 %% Solving for Pressure field
 
@@ -134,7 +134,11 @@ K_l = 1/(1.8*10^9); %Of the liquid
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 
-
+pyrs = pi;
+baba = 4.2736+1;
+dede = 4.8295;
+seis = 6;
+minus_i = 1i;
 
 
 % a = zeros(10,1);
@@ -153,12 +157,12 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
 
 velocities = zeros(100,1);
-v = EOM_Particle(Gorkov,B)
+v = EOM_Particle(Gorkov)
 
 for i = 1:length(velocities)
     x = linspace(0.000013,0.05,length(velocities));
     x = x(i);
-v = EOM_Particle(Gorkov,B);
+v = EOM_Particle(Gorkov);
 vnew = subs(v)
 v_double = double(vnew)
 velocities(i) = real(v_double);

@@ -1,6 +1,7 @@
-function [v] = EOM_Particle(Fac,B)
+function [v] = EOM_Particle(Fac)
 %EOM_PARTICLE Summary of this function goes here
 %   Detailed explanation goes here
-v = Fac/B;
+syms seis pyrs r mu
+v = Fac/(seis*pyrs*r*mu);
 end
 
