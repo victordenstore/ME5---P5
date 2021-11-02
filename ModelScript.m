@@ -25,8 +25,8 @@ C_o=S/(Beta_33*d);                 % the clamped capacitance of the plate - Foun
 n=h_33*C_o;                        % A given constant
 
 %TAa calculated inputs
-x=0.0000042;                       % Random variable to establish acoustic backing material relationship
-Z_b=x*w;                           % Acoustic impedance of the backing plate (this is a function of frequency)  
+dfr=0.0000042;                       % Random variable to establish acoustic backing material relationship
+Z_b=dfr*w;                           % Acoustic impedance of the backing plate (this is a function of frequency)  
 k=w/v_o;                           % wave number for the peizoelectric plate - found from NDE book
 
 
@@ -74,7 +74,7 @@ S_FV=Z_r*S_vI/Z_in; %Sensitivity FV
 %% Graphing
 
 t = linspace(0,10*pi/w,1000);
-x = linspace(0,L,1000);
+x = linspace(0,5*0.0013,1000);
 alfa = -40;
 V_in = zeros(1000,1);
 %F = zeros(1000,1);
@@ -82,11 +82,11 @@ V_in = zeros(1000,1);
 %expression = zeros(1000,1000);
 
 %% Solving for Pressure at transducer face
-S_FV = abs(S_FV)*exp(1i*atan((imag(S_FV)/real(S_FV))))
+% S_FV = abs(S_FV)*exp(1i*atan((imag(S_FV)/real(S_FV))))
 V_M = 150;
 lambda =c/f;
 F_surface = V_M * S_FV;
-P_surface = F_surface/(S_a*35);
+P_surface = F_surface/(S_a);
 
 %% Solving for Pressure field
 
@@ -156,7 +156,7 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
 
-velocities = zeros(100,1);
+velocities = zeros(1000,1);
 v = EOM_Particle(Gorkov)
 
 for i = 1:length(velocities)
