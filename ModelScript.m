@@ -93,11 +93,17 @@ P_surface = F_surface/(S_a);
 damp_coeff =(2*Kin_Vis*w^2)/(3*c^3);
 exp1 = zeros(1000,1000);
 shit = zeros(1000,1);
+R1 = 4.2736;
+R2 = 4.8295;
 
  for to = 1:1000
      for gi = 1:1000
      exp1(to,gi) = P_surface*(4.2736+1) * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)*exp(- damp_coeff * x(to)) ...
          - 4.8295*P_surface * exp(1i*w*t(gi)+1i*(x(to))*2*pi/lambda)*exp(- damp_coeff * (L-x(to)));
+     
+     exp2(to,gi) = P_surface*(exp(1i*w*t(gi)+1i*x(to)*2*pi/lambda) + R1 * exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda))...
+         + (P_surface*(R2 * exp(1i*w*t(gi)+1i*x(to)*2*pi/lambda) + exp(1i*w*t(gi)-1i*x(to)*2*pi/lambda)))*exp(1i*pi);
+     
      
      end
  end
@@ -115,8 +121,12 @@ time_vecs = linspace(0,10*pi/w,1000);
 meshc(t, x, real(exp1)); colormap jet; colorbar;
 xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
 
- %hold on
- %end
+figure
+meshc(t, x, real(exp2)); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
+
+
+ 
 
 %% Constants for Simulink matlab code:
 rho_p = 1.225; %Air density kg/m^3
@@ -156,16 +166,15 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 %a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x,damp_coeff,P_surface),B,v)
 
-velocities = zeros(1000,1);
-v = EOM_Particle(Gorkov)
+velocities = zeros(10,1);
+
 
 for i = 1:length(velocities)
     x = linspace(0.000013,0.05,length(velocities));
     x = x(i);
-v = EOM_Particle(Gorkov);
+v = EOM_Particle(Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c));
 vnew = subs(v)
-v_double = double(vnew)
-velocities(i) = real(v_double);
+velocities(i) = double(vnew);
 end
 
 x = linspace(0.000013,0.05,length(velocities));
@@ -173,13 +182,10 @@ x = linspace(0.000013,0.05,length(velocities));
 figure
 plot(x',velocities)
 
-
-
-
-% %% Open Simulink Model 
-% open('SimulinkModel');
+% % %% Open Simulink Model 
+% % open('SimulinkModel');
+% % 
+% % 
+% % %% Simulation
+% % Simulation = sim('SimulinkModel');
 % 
-% 
-% %% Simulation
-% Simulation = sim('SimulinkModel');
-
