@@ -1,5 +1,5 @@
 
-         function [Fac] = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c)
+         function [v,p_mean_square,v_in,v_mean_square,Uac,Fac] = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c,B)
          
 
     syms x t 
@@ -17,5 +17,5 @@ v_mean_square = 1/T*int(real(v_in)^2,t,[0 T]);
 
 Uac = 4*pi/3 * r^3 * (f_1 * 1/(2*rho_l*c^2) * p_mean_square - f_2 * 3/4*rho_l*v_mean_square);
 Fac= -(diff(Uac,x));
-
+v = Fac/B;
 end

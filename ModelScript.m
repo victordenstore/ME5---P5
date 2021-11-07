@@ -108,22 +108,24 @@ R2 = 4.8295;
      end
  end
 
-
-
-
+%% Contourplots of the two standing wave variations
+figure
+tiledlayout(2,1); nexttile;
 contourf(t, x, real(exp1), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); 
+xlabel('time [s]'); ylabel('distance [m]'); title('standing wave');
+nexttile; 
+contourf(t, x, real(exp2), 14); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]'); title('standing wave corrected');
+
+%% Surface plots of the two standing wave variations
 
 figure
-time_vecs = linspace(0,10*pi/w,1000);
-
-% for phil = 1:1000
+tiledlayout(2,1); nexttile;
 meshc(t, x, real(exp1)); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
-
-figure
+xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('standing wave');
+nexttile;
 meshc(t, x, real(exp2)); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]')
+xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('standing wave corrected');
 
 
  
@@ -154,12 +156,10 @@ minus_i = 1i;
 % a = zeros(10,1);
 % x = zeros(11,1);
 % t = linspace(0,11*2*pi/w,11)';
-v = zeros(11,1);
 T = 1/f;
-x = 0.0013/8; %5cm, intial bubble placement
+% x = 0.0013/8; %5cm, intial bubble placement
 v = 0;       % intital bubble velocity
 t = 0;       % initial time
-% a = EOM_Particle(Mp,Gorkov(c, rho_l, r, f_1, f_2,w,T,x(1),damp_coeff,P),B,v(1));
 acoustic_contrast_factor = (5*rho_p-2*rho_l)/(2*rho_p+rho_l) - (K_p/K_l)
 Eac = P_surface*2 / (4*rho_l*c^2);
 
@@ -168,12 +168,11 @@ Eac = P_surface*2 / (4*rho_l*c^2);
 
 velocities = zeros(10,1);
 
-
 for i = 1:length(velocities)
-    x = linspace(0.000013,0.05,length(velocities));
+    x = linspace(0.0013,0.0026,length(velocities));
     x = x(i);
-v = EOM_Particle(Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c));
-vnew = subs(v)
+v = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c,B);
+vnew = subs(v);
 velocities(i) = double(vnew);
 end
 
@@ -182,10 +181,43 @@ x = linspace(0.000013,0.05,length(velocities));
 figure
 plot(x',velocities)
 
-% % %% Open Simulink Model 
-% % open('SimulinkModel');
-% % 
-% % 
-% % %% Simulation
-% % Simulation = sim('SimulinkModel');
-% 
+
+%% Here I tried to plot the different contributions to the acoustic force similar to figure 9 of the Trujillo paper
+
+x = linspace(0.0013,0.0026,length(velocities));  % set to one wavelength, can be changed
+[v,p_mean_square,v_in,v_mean_square,Uac,Fac]  = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c,B)
+p_ms = double(subs(p_mean_square));
+v_ms = double(subs(v_mean_square));
+Uac = double(subs(Uac));
+Fac = double(subs(Fac));
+
+p_ms_vc = [p_ms; p_ms; p_ms; p_ms; p_ms; p_ms; p_ms; p_ms; p_ms; p_ms];     % Matrices for plotting. Constructed 
+v_ms_vc = [v_ms; v_ms; v_ms; v_ms; v_ms; v_ms; v_ms; v_ms; v_ms; v_ms];     % in the same way as for the pressure
+Uac_vc = [Uac; Uac; Uac; Uac; Uac; Uac; Uac; Uac; Uac; Uac];                % field plot, only Thid time there is 
+Fac_vc = [Fac; Fac; Fac; Fac; Fac; Fac; Fac; Fac; Fac; Fac];                % no change in values through time, as 
+                                                                            % they are time averages.
+time_averaged_vec = linspace(0,T,length(velocities));  % Since all are time-averaged, I just made a random duration 
+                                                       % of one period,
+                                                       % which I use to be
+                                                       % able to make a
+                                                       % contour plot.
+figure                                                      
+tiledlayout(2,2); nexttile;
+contourf(x,time_averaged_vec,real(p_ms_vc), 14); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]'); title('<p^2>');
+
+nexttile;
+contourf(x,time_averaged_vec,real(v_ms_vc), 14); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]'); title('<v^2>');
+
+nexttile;
+contourf(x,time_averaged_vec,real(Uac_vc), 14); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]'); title('Uac');
+
+nexttile;
+contourf(x,time_averaged_vec,real(Fac_vc), 14); colormap jet; colorbar;
+xlabel('time [s]'); ylabel('distance [m]'); title('Fac');
+
+
+
+
