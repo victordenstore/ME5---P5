@@ -4,8 +4,8 @@
 
     syms x t 
     
-P_field = P_surface*(exp(1i*w*t+1i*x*2*pi/lambda) + R1 * exp(1i*w*t-1i*x*2*pi/lambda))...
-         + (P_surface*(R2 * exp(1i*w*t+1i*x*2*pi/lambda) + exp(1i*w*t-1i*x*2*pi/lambda)))*exp(1i*pi);
+P_field = P_surface*(exp(-1i*w*t+1i*x*2*pi/lambda) + R1 * exp(-1i*w*t-1i*x*2*pi/lambda))...
+         + (P_surface*(R2 * exp(-1i*w*t+1i*x*2*pi/lambda) + exp(-1i*w*t-1i*x*2*pi/lambda)))*exp(1i*pi);
 
 p_mean_square = 1/T * int(real(P_field)^2,t,[0 T]);
 

@@ -25,12 +25,16 @@ C_o=S/(Beta_33*d);                 % the clamped capacitance of the plate - Foun
 n=h_33*C_o;                        % A given constant
 
 %TAa calculated inputs
-dfr=0.0000042;                       % Random variable to establish acoustic backing material relationship
-Z_b=dfr*w;                           % Acoustic impedance of the backing plate (this is a function of frequency)  
+% dfr=0.0000042;                       % Random variable to establish acoustic backing material relationship
+% Z_b=dfr*w;                           % Acoustic impedance of the backing plate (this is a function of frequency)  
 k=w/v_o;                           % wave number for the peizoelectric plate - found from NDE book
 
 
 %% Acoustic impedance calculations
+rho_4=7860;                          % Density of plain carbon steel 
+c_3=3230;                            % Speed of wave in plain carbon steel
+Z_b=rho_4*c_3*S;                     % Acoustic impedance of the backing plate
+
 Z_o=rho*v_o*S;                       % plane wave acoustic impedance of the piezoelectric plate
 
 S_a=S;                               % effective face area of the transducer
