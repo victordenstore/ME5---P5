@@ -208,19 +208,19 @@ time_averaged_vec = linspace(0,T,length(velocities));  % Since all are time-aver
 figure                                                      
 tiledlayout(2,2); nexttile;
 contourf(x,time_averaged_vec,real(p_ms_vc), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); title('<p^2>');
+xlabel('distance [m]'); ylabel('time [s]'); title('<p^2>');
 
 nexttile;
 contourf(x,time_averaged_vec,real(v_ms_vc), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); title('<v^2>');
+xlabel('distance [m]'); ylabel('time [s]'); title('<v^2>');
 
 nexttile;
 contourf(x,time_averaged_vec,real(Uac_vc), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); title('Uac');
+xlabel('distance [m]'); ylabel('time [s]'); title('Uac');
 
 nexttile;
 contourf(x,time_averaged_vec,real(Fac_vc), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); title('Fac');
+xlabel('distance [m]'); ylabel('time [s]'); title('Fac');
 
 
 
