@@ -114,8 +114,8 @@ x = linspace(0,5*0.0013,1000);                                              % Di
 % shifts at a certain location in space and moment in time.
  for n = 1:1000
      for m = 1:1000
-     P_field(n,m) = P_surface*(R1+1) * exp(1i*w*t(m)-1i*x(n)*2*pi/lambda)*exp(- damp_coeff * x(n)) ...
-         - R2*P_surface * exp(1i*w*t(m)+1i*(x(n))*2*pi/lambda)*exp(- damp_coeff * (L-x(n)));
+     P_field(n,m) = P_surface*(R1+1) * exp(1i*w*t(m)-1i*x(n)*2*pi/lambda) ...
+         - R2*P_surface * exp(1i*w*t(m)+1i*(x(n))*2*pi/lambda);
       end
  end
 
@@ -124,14 +124,14 @@ x = linspace(0,5*0.0013,1000);                                              % Di
 % 2D plot which shows the pressure minima and maxima of the pressure field
 figure
 contourf(t,x, real(P_field), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); title('standing wave');
+xlabel('time [s]'); ylabel('distance [m]'); title('Contourplot of the 1D pressurefield');
 
 %% Surface plots of the standing pressure wave
 
 % 3D animation of the pressure field
 figure
 meshc(t,x, real(P_field)); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('standing wave');
+xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('Surface plot of the 1D pressure field');
 
 
  
@@ -180,7 +180,7 @@ velocities = zeros(10,1);                                                   % A 
 for i = 1:length(velocities)
     x = linspace(0.0013,0.0026,length(velocities));                         % The distance over which the velocity is monitored 
     x = x(i);                                                                        
-v = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c,B,damp_coeff,L);    % Call upon the function to obtain the velocity.
+v = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c,B);    % Call upon the function to obtain the velocity.
 vnew = subs(v);                                                             % Constants are substituted for the symbolic variables.
 velocities(i) = double(vnew);                                               % the velocities are stored as scalars.
 end
@@ -190,6 +190,7 @@ x = linspace(0.0013,0.0026,length(velocities));
 % from the transducer surface.
 figure
 plot(x',velocities)
+xlabel('distance [m]'); ylabel('velocity [m/s]'); title('Particle velocities');
 
 
 %% Here I tried to plot the different contributions to the acoustic force similar to figure 9 of the Trujillo paper
@@ -199,7 +200,7 @@ x = linspace(0.0013,0.0026,length(velocities));                             % Mo
                                                                             % changed.
 % Here the outputs of the function are retrieved and converted from 
 % symbols to numbers.
-[v,p_mean_square,v_in,v_mean_square,Uac,Fac]  = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c,B,damp_coeff,L); 
+[v,p_mean_square,v_in,v_mean_square,Uac,Fac]  = Gorkov(P_surface,w,lambda,R1,R2,T,rho_l,r,f_1,f_2,c,B); 
 p_ms = double(subs(p_mean_square));
 v_ms = double(subs(v_mean_square));
 Uac = double(subs(Uac));
