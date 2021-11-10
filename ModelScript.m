@@ -123,13 +123,13 @@ xlabel('time [s]'); ylabel('distance [m]'); title('standing wave corrected');
 
 %% Surface plots of the two standing wave variations
 
-figure
-tiledlayout(2,1); nexttile;
-meshc(t, x, real(exp1)); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('standing wave');
-nexttile;
-meshc(t, x, real(exp2)); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('standing wave corrected');
+% figure
+% tiledlayout(2,1); nexttile;
+% meshc(t, x, real(exp1)); colormap jet; colorbar;
+% xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('standing wave');
+% nexttile;
+% meshc(t, x, real(exp2)); colormap jet; colorbar;
+% xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('standing wave corrected');
 
 
  
@@ -144,8 +144,8 @@ rho_l = 868; %Oil density kg/m^3
 mu = 32*10^-6*rho_l; %ISO VG32 Viscosity kg/m*s
 B = 6*pi*r*mu;
 
-K_p = 1/(101*10^3); %Compressibility factor of the particle
-K_l = 1/(1.8*10^9); %Of the liquid
+K_p = 1/(rho_p*330^2); %Compressibility factor of the particle
+K_l = 1/(rho_l*c^2); %Of the liquid
 
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
@@ -164,7 +164,7 @@ T = 1/f;
 % x = 0.0013/8; %5cm, intial bubble placement
 v = 0;       % intital bubble velocity
 t = 0;       % initial time
-acoustic_contrast_factor = (5*rho_p-2*rho_l)/(2*rho_p+rho_l) - (K_p/K_l)
+acoustic_contrast_factor = (5*rho_p-2*rho_l)/(2*rho_p+rho_l) - (K_p/K_l);
 Eac = P_surface*2 / (4*rho_l*c^2);
 
 
@@ -206,7 +206,7 @@ time_averaged_vec = linspace(0,T,length(velocities));  % Since all are time-aver
                                                        % able to make a
                                                        % contour plot.
 figure                                                      
-tiledlayout(2,2); nexttile;
+tiledlayout(4,1); nexttile;
 contourf(x,time_averaged_vec,real(p_ms_vc), 14); colormap jet; colorbar;
 xlabel('distance [m]'); ylabel('time [s]'); title('<p^2>');
 
