@@ -2,7 +2,8 @@
 % The model is based on a model created by Sittig and utilizes derivations of it in the form of transfer functions. An expression for the pressure field
 % was derived from the 1D wave equation. Eventually the force on the particles was calculated by utilization of Gor'kov's potential.
 % 
-% The authors of this script are Victor Dahl, Phillip Kjaer, Wenzel Neumann and Jeppe Odense
+% The authors of this script are Victor Dahl, Phillip Kjaer, Wenzel Neumann
+% and Jeppe Ottense
 
 
 clear all; close all; clc;
