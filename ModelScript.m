@@ -150,11 +150,7 @@ K_l = 1/(1.8*10^9); %Of the liquid
 f_1=1-(K_p/K_l); %f_1 of the Gorkov eq.
 f_2=2*(rho_p-rho_l)/(2*rho_p+rho_l); %f_2 of the Gorkov eq.
 
-pyrs = pi;
-baba = 4.2736+1;
-dede = 4.8295;
-seis = 6;
-minus_i = 1i;
+
 
 
 % a = zeros(10,1);
