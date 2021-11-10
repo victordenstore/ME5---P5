@@ -5,4 +5,6 @@ x = input('put in whatever value you want here to compare: ');
 Fac_local = double(subs(Fac));
 v_local = double(subs(v));
 clc
-disp(Fac_local); disp(v_local);
+string1 = ['Fac_local = ' num2str(Fac_local)]
+string2 = ['v_local = ' num2str(v_local)];
+disp(string1); disp(string2);
