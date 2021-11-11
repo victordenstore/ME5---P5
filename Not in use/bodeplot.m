@@ -11,7 +11,7 @@ a=2.5*10^-3;                     % Radius of the piezoelectric plate
 S=pi*a^2;                        % Piezoelectric surface area
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
-d=2*2*10^-3;                       % plate thickness
+d=2*10^-3;                       % plate thickness
 rho_4=7860;                          % Density of plain carbon steel 
 c_3=3230;                            % Speed of wave in plain carbon steel
 Z_b=rho_4*c_3*S;                         % Acoustic impedance of the backing plate
@@ -24,7 +24,7 @@ c=1300;                          % compresisonal wave speed in fluid
 h_33= d_33/(s_33*epsilon_33);    % Piezoelectric stiffness constant for the plate
 v_o=sqrt(c_33/rho);              % compressional wave speed from piezoelectric
 k=w/v_o;                         % wave number for the peizoelectric plate
-C_o=S/(Beta_33*d);               % the clamped capacitance of the plate
+C_o=S*epsilon_33/(d);               % the clamped capacitance of the plate
 n=h_33*C_o;                      % A given constant
 S_a=S;                           % effective face area of the transducer
 rho_2=857;                       % density of the fluid
@@ -86,6 +86,7 @@ tiledlayout(2,1);
 
 nexttile
 plot(w/(2*pi),S_FV,'g')
+ylim([-150 -25])
 nexttile
 plot(w/(2*pi),phase)
 

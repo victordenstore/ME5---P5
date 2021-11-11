@@ -29,7 +29,7 @@ h_33= d_33/(s_33*epsilon_33);      % Piezoelectric stiffness constant for the pl
 v_o=sqrt(c_33/rho);                % compressional wave speed from piezoelectric - found from source -||-
 
 %%TAe calculated inputs
-C_o=S/(Beta_33*d);                 % the clamped capacitance of the plate - Found from NDE book
+C_o=S*epsilon_33/(d);                 % the clamped capacitance of the plate - Found from NDE book
 n=h_33*C_o;                        % A given constant
 
 %TAa calculated inputs
