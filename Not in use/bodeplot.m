@@ -82,13 +82,22 @@ phase = rad2deg(angle(S_FV));
 S_FV = 20*log10(abs(S_FV))
 %% figure
 
+figure
 tiledlayout(2,1);
-
 nexttile
 plot(w/(2*pi),S_FV,'g')
 ylim([-150 -25])
 nexttile
 plot(w/(2*pi),phase)
+
+figure
+tiledlayout(2,1);
+nexttile
+Z_Ae_in1 =  20*log10(abs(Z_Ae_in))
+plot(w/(2*pi),Z_Ae_in1,'g')
+nexttile
+phase1 = rad2deg(angle(Z_Ae_in));
+plot(w/(2*pi),phase1)
 
 
 
