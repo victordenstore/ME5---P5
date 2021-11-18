@@ -24,7 +24,7 @@ c=1300;                          % compresisonal wave speed in fluid
 h_33= d_33/(s_33*epsilon_33);    % Piezoelectric stiffness constant for the plate
 v_o=sqrt(c_33/rho);              % compressional wave speed from piezoelectric
 k=w/v_o;                         % wave number for the peizoelectric plate
-C_o=S*epsilon_33/(d);               % the clamped capacitance of the plate
+C_o=2*S*epsilon_33/(2*10^-3);               % the clamped capacitance of the plate
 n=h_33*C_o;                      % A given constant
 S_a=S;                           % effective face area of the transducer
 rho_2=857;                       % density of the fluid
@@ -72,7 +72,7 @@ Z_Aa_r = rho_2*c*S_a;
 T_A = T_A(boy:boy1,1:2)*TAl_matrix(boy:boy1,1:2);
 S_A_vl(i) = 1/(Z_Aa_r*T_A(2,1) + T_A(2,2));
 
-Z_Ae_in(i) = (Z_Aa_r*T_A(1,1) + T_A(1,2))/(Z_Aa_r*T_A(2,1) + T_A(2,2));
+Z_Ae_in(i) = (Z_Aa_r*T_A(1,1) + T_A(1,2))/(Z_Aa_r*T_A(2,1) + T_A(2,2))+1i*w(i)*4.34*10^-6;
 
 S_FV(i) = Z_Aa_r * S_A_vl(i)/Z_Ae_in(i);
 end
@@ -86,7 +86,7 @@ figure
 tiledlayout(2,1);
 nexttile
 plot(w/(2*pi),S_FV,'g')
-ylim([-150 -25])
+ylim([-75 -25])
 nexttile
 plot(w/(2*pi),phase)
 
