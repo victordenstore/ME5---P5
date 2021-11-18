@@ -190,4 +190,83 @@ subplot(2,1,1)
 plot(freq,mag_PF); title('Theoretical voltage at 2nd transducer'); xlabel('frequency [kHz]'); ylabel('magnitude [V]');
 subplot(2,1,2); plot(M(:,1),M(:,5)); title('2nd transducer magnitude'); xlabel('frequency [kHz]'); ylabel('magnitude [mV]');
 
+%% Fourier domain, of the sine sweep
+
+filename = 'C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\FrequencySweep400k1.5M40ms_10ms_000_ALL.csv';
+sinesweep = readtable(filename);
+n = 617385:1255020;
+%n = 1:length(sinesweep.CH2);
+Fs = 1/2e-8;                    % Note that the sampling time actually fluctuates, but idk how to handle that
+T = 1/Fs;
+L = length(n);
+t = (0:L-1)*T;
+
+
+current = sinesweep.CH2(n);
+voltage = sinesweep.CH3(n);
+impedance = voltage./current;
+
+inf_values = find(isinf(impedance));
+newvalues = zeros(length(inf_values),1);
+
+for a = 1:length(inf_values)
+    newvalues(a) = (impedance(inf_values(a)+1) - impedance(inf_values(a)-1))/2;
+end
+
+impedance(inf_values) = newvalues;
+
+
+timelength = sinesweep.TIME(n);
+figure
+subplot(3,1,1); plot(timelength,current) 
+title('current in the time domain')
+xlabel('time [s]')
+ylabel('Amplitude [v]');
+subplot(3,1,2); plot(timelength,voltage) 
+title('voltage in the time domain')
+xlabel('time [s]')
+ylabel('Amplitude [v]');
+subplot(3,1,3); plot(timelength,impedance) 
+title('impedance in the time domain')
+xlabel('time [s]')
+ylabel('Amplitude [v]');
+
+figure
+plot(timelength,impedance)
+
+
+lowpass(impedance,1.5e6,Fs)
+Y = fft(current);
+Y1 = fft(voltage);
+Y2 = fft(impedance);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+P4 = abs(Y1/L);
+P3 = P4(1:L/2+1);
+P3(2:end-1) = 2*P3(2:end-1);
+
+P6 = abs(Y2/L);
+P5 = P6(1:L/2+1);
+P5(2:end-1) = 2*P5(2:end-1);
+
+
+f = Fs*(0:(L/2))/L;
+figure
+subplot(3,1,1); plot(f,P1) 
+title('Single-Sided Amplitude Spectrum of the current')
+xlabel('f (Hz)')
+subplot(3,1,2); plot(f,P3) 
+title('Single-Sided Amplitude Spectrum of the voltage')
+xlabel('f (Hz)')
+ylabel('|P1(f)|')
+subplot(3,1,3); plot(f,P5) 
+title('Single-Sided Amplitude Spectrum of the impedance')
+xlabel('f (Hz)')
+ylabel('|P1(f)|')
+
+
+
 
