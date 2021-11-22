@@ -122,7 +122,6 @@ tiledlayout(2,1); nexttile
 plot(M(:,1),Z_in_mag); title('Impedance magnitude'); xlabel('frequency [kHz]'); ylabel('magnitude [DB]');
 nexttile; plot(M(:,1),-phase1); title('Impedance angle'); xlabel('frequency [kHz]'); ylabel('angle [degree]');
 
-
 %% 2nd transducer, pressure wave magnitude calculation
 
 R1 = 4.2736;                                                                % Left wall reflection coefficient.
@@ -231,42 +230,48 @@ title('impedance in the time domain')
 xlabel('time [s]')
 ylabel('Amplitude [v]');
 
+h = timeseries(impedance);
+h.TIME = timelength;
+g = etfe(h.Data);
 figure
-plot(timelength,impedance)
+bode(g)
 
-
-lowpass(impedance,1.5e6,Fs)
-Y = fft(current);
-Y1 = fft(voltage);
-Y2 = fft(impedance);
-
-P2 = abs(Y/L);
-P1 = P2(1:L/2+1);
-P1(2:end-1) = 2*P1(2:end-1);
-
-P4 = abs(Y1/L);
-P3 = P4(1:L/2+1);
-P3(2:end-1) = 2*P3(2:end-1);
-
-P6 = abs(Y2/L);
-P5 = P6(1:L/2+1);
-P5(2:end-1) = 2*P5(2:end-1);
-
-
-f = Fs*(0:(L/2))/L;
-figure
-subplot(3,1,1); plot(f,P1) 
-title('Single-Sided Amplitude Spectrum of the current')
-xlabel('f (Hz)')
-subplot(3,1,2); plot(f,P3) 
-title('Single-Sided Amplitude Spectrum of the voltage')
-xlabel('f (Hz)')
-ylabel('|P1(f)|')
-subplot(3,1,3); plot(f,P5) 
-title('Single-Sided Amplitude Spectrum of the impedance')
-xlabel('f (Hz)')
-ylabel('|P1(f)|')
-
-
-
-
+% figure
+% plot(timelength,impedance)
+% 
+% 
+% lowpass(impedance,1.5e6,Fs)
+% Y = fft(current);
+% Y1 = fft(voltage);
+% Y2 = fft(impedance);
+% 
+% P2 = abs(Y/L);
+% P1 = P2(1:L/2+1);
+% P1(2:end-1) = 2*P1(2:end-1);
+% 
+% P4 = abs(Y1/L);
+% P3 = P4(1:L/2+1);
+% P3(2:end-1) = 2*P3(2:end-1);
+% 
+% P6 = abs(Y2/L);
+% P5 = P6(1:L/2+1);
+% P5(2:end-1) = 2*P5(2:end-1);
+% 
+% 
+% f = Fs*(0:(L/2))/L;
+% figure
+% subplot(3,1,1); plot(f,P1) 
+% title('Single-Sided Amplitude Spectrum of the current')
+% xlabel('f (Hz)')
+% subplot(3,1,2); plot(f,P3) 
+% title('Single-Sided Amplitude Spectrum of the voltage')
+% xlabel('f (Hz)')
+% ylabel('|P1(f)|')
+% subplot(3,1,3); plot(f,P5) 
+% title('Single-Sided Amplitude Spectrum of the impedance')
+% xlabel('f (Hz)')
+% ylabel('|P1(f)|')
+% 
+% 
+% 
+% 
