@@ -192,6 +192,9 @@ Z_E(a) = (A(a)*Z_FP + B(a))/(C(a)*Z_FP + D(a));            % electrical input im
 V_IL(a) = Z_FP/(A(a)*Z_FP + B(a));                         % voltage transfer ratio between input voltage and output force
 end
 
+admittance = 1./Z_E;
+phase_admittance = rad2deg(angle(admittance));
+mag_admittance = 20*log10(abs(admittance));
 phase_impedance = rad2deg(angle(Z_E));
 phase_tf = rad2deg(angle(V_IL));
 mag_impedance = 20*log10(abs(Z_E));
@@ -211,6 +214,12 @@ figure
 subplot(2,1,1); plot(f(ind),pks,'or'); hold on; plot(f,mag_tf); title('Bode magnitude plot of the transfer function V_{in} --> F_{out}'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 subplot(2,1,2); plot(f,phase_tf); title('Phase plot of the transfer function V_{in} --> F_{out}'); ...
+    xlabel('frequency [Hz]'); ylabel('phase [degree]');
+
+figure
+subplot(2,1,1); plot(f,mag_admittance); title('Bode magnitude plot of the admittance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+subplot(2,1,2); plot(f,phase_admittance); title('Phase plot of the admittance'); ...
     xlabel('frequency [Hz]'); ylabel('phase [degree]');
 
 

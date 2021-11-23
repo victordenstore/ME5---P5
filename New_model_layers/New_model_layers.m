@@ -4,7 +4,7 @@ clc;
 %% Parameter initialization
 
 j = 1i;                                                                     % imaginary value
-f = 5.42*10^5;                                                               % operating frequency [Hz]
+f = 11.53*10^5;                                                               % operating frequency [Hz]
 omega = 2*pi*f;                                                             % operating frequency [rad/s] 
 c_33 = 16.6*10^10;                                                          % Elastic compliance coefficient
 c_n = c_33;                                                                 % Comes from the multilayer paper.
