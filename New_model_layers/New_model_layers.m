@@ -3,28 +3,29 @@ clear all;
 clc;
 %% Parameter initialization
 
-j = 1i;
-f = 4.3*10^5;
-omega = 2*pi*f; 
-c_33 = 16.6*10^10;
-c_n = c_33;
-rho_n = 7.8*10^3; 
-v_n = sqrt(c_n/rho_n);
-c_mn = v_n;
-d_n = 2*10^-3;
-l_mn = d_n;
-f_mn = c_mn/(2*l_mn);
+j = 1i;                                                                     % imaginary value
+f = 4.3*10^5;                                                               % operating frequency [Hz]
+omega = 2*pi*f;                                                             % operating frequency [rad/s] 
+c_33 = 16.6*10^10;                                                          % Elastic compliance coefficient
+c_n = c_33;                                                                 % Comes from the multilayer paper.
+rho_n = 7.8*10^3;                                                           % density of the piezoelectric disc.
+v_n = sqrt(c_n/rho_n);                                                      % wave speed of compressional waves in the piezoelectric plate
+c_mn = v_n;                                                                 % sound velocity.
+d_n = 2*10^-3;                                                              % thickness of the piezoelectric plate.
+l_mn = d_n;                                                                 % thickness according to Sittig schwanzel.
+f_mn = c_mn/(2*l_mn);                                                       % some specific frequency I guess.
 %f_backing = c_backing/(2*l_backing);
 
 
-gamma = omega * d_n/v_n;
+gamma = omega * d_n/v_n;                                                    % 
 eps_0=8.854*10^-12;          
 eps_33=1200*eps_0;
 s_33 = 14.2*10^-12;
 d_33 = 265*10^-12;
 h_33 = d_33/(s_33*eps_33);
-k = sqrt(h_33^2 *eps_33/c_33);
-s = k^2 * sin(gamma)/gamma;
+k_n_squared = h_33^2 *eps_33/c_33;
+k_squared = k_n_squared;
+s = k_squared * sin(gamma)/gamma;
 %gamma_mn = [pi*f/f_mn pi*f/f_backing];
 r = 2.5*10^-3; 
 S = pi*r^2;
@@ -32,8 +33,8 @@ C_0= S*eps_33/(d_n);
 Z_0 = rho_n*v_n*S;
 omega_mn = 2*pi*f_mn;
 Z_mn = Z_0;
-phi = k*sqrt(omega_mn*c_mn*Z_mn/pi);
-c = k^2 * (1-cos(gamma))/gamma;
+phi = sqrt(k_squared)*sqrt(omega_mn*c_mn*Z_mn/pi);
+c = k_squared * (1-cos(gamma))/gamma;
 A_mn = S;
 Q_mn = rho_n;
 Z_mn = A_mn * Q_mn; 
@@ -56,7 +57,7 @@ Kin_Vis=32*10^-6;
 
 T_11 = (cos(gamma) - s)/(1-s);
 T_12 = (j*Z_0*(sin(gamma) - 2*c))/(1-s);
-T_13 = -((cos(gamma) - 2*c)*phi)/(1-s);
+T_13 = -((cos(gamma) - 1)*phi)/(1-s);
 T_14 = 0;
 T_21 = (j*sin(gamma))/(Z_0*(1-s));
 T_22 = (cos(gamma) - s)/(1-s);
@@ -84,7 +85,7 @@ Z_copper = A_copper*rho_copper*c_copper;
 gamma_copper = omega * d_copper/v_copper;
 
 A_copper = [cos(gamma_copper) j*Z_copper*sin(gamma_copper); ...
-    (j*sin(gamma_copper))/Z_mn cos(gamma_copper)];
+    (j*sin(gamma_copper))/Z_copper cos(gamma_copper)];
 
 rho_FP = 7850;
 r_FP = 4.5*10^-3;
@@ -114,7 +115,7 @@ B_c = T_32 - T_33*(T_22*Z_b + T_12)/(T_23*Z_b + T_13);
 C_c = T_41 - T_43*(T_21*Z_b + T_11)/(T_23*Z_b + T_13);
 D_c = T_42 - T_43*(T_22*Z_b + T_12)/(T_23*Z_b + T_13);
 
-A_C = [A_c B_c; C_c D_c]^2;
+A_C = [A_c B_c; C_c D_c];
 
 %% Final 2x2 matrix of Piezo stack
 
@@ -127,8 +128,14 @@ D = A_ps(2,2);
 
 %% Sensitivity Functions
 
-Z_E = (A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
-V_IL = Z_FP/(A*Z_FP + B);                   % voltage transfer ratio between input voltage and output force
+S_a=S;                               % effective face area of the transducer
+rho_2=857;                           % density of the fluid ISO VG 32
+c=1300;                              % compresisonal wave speed in fluid 
+Z_r=S_a*c*rho_2;                     % Acoustic radiation impedance 
+
+
+Z_E = (A*Z_r + B)/(C*Z_r + D);            % electrical input impedance
+V_IL = Z_r/(A*Z_r + B);                   % voltage transfer ratio between input voltage and output force
 
 
 
