@@ -4,7 +4,7 @@ clc;
 %% Parameter initialization
 
 j = 1i;                                                                     % imaginary value
-f = 11.53*10^5;                                                               % operating frequency [Hz]
+f = 4.30*10^5;                                                               % operating frequency [Hz]
 omega = 2*pi*f;                                                             % operating frequency [rad/s] 
 c_33 = 16.6*10^10;                                                          % Elastic compliance coefficient
 c_n = c_33;                                                                 % Comes from the multilayer paper.
@@ -52,7 +52,7 @@ Kin_Vis=32*10^-6;
 
 
 
-%% 4 port model matrix
+%% 4 port model matrix - Sittig
 
 
 T_11 = (cos(gamma) - s)/(1-s);
@@ -72,6 +72,27 @@ T_42 = -((cos(gamma) - 1)*phi)/(1-s);
 T_43 = (j*omega*C_0)/(1-s);
 T_44 = 1;
 
+Tn=[T_11 T_12 T_13 T_14; ...
+    T_21 T_22 T_23 T_24; ...
+    T_31 T_32 T_33 T_34; ...
+    T_41 T_42 T_43 T_44];
+T=(Tn)^2;
+T_11=Tn(1,1);
+T_12=Tn(1,2);
+T_13=Tn(1,3);
+T_14=Tn(1,4);
+T_21=Tn(2,1);
+T_22=Tn(2,2);
+T_23=Tn(2,3);
+T_24=Tn(2,4);
+T_31=Tn(3,1);
+T_32=Tn(3,2);
+T_33=Tn(3,3);
+T_34=Tn(3,4);
+T_41=Tn(4,1);
+T_42=Tn(4,2);
+T_43=Tn(4,3);
+T_44=Tn(4,4);
 %% Intermediate layers (ex. glue layers, copper electrode, etceteraness)
 
 r_copper = 2.5*10^-3;
@@ -100,7 +121,18 @@ gamma_FP = omega*d_FP/v_FP;
 A_FP = [cos(gamma_FP) j*Z_FP*sin(gamma_FP); ...
     (j*sin(gamma_FP))/Z_FP cos(gamma_FP)];
 
-A_m = A_copper;
+rho_H = 7860;
+r_H = 2.5*10^-3;
+c_H = 3230;
+S_H = pi*r_H^2;
+d_H = 3.25*10^-3;
+v_H = sqrt(c_H/rho_H);
+gamma_H = omega*d_H/v_H;
+Z_H = rho_H*c_H*S_H;
+A_H = [cos(gamma_H) j*Z_H*sin(gamma_H); ...
+    (j*sin(gamma_H))/Z_H cos(gamma_H)];
+
+A_m = A_copper*A_FP*A_H;
 A_b = A_m(1,1);
 B_b = A_m(1,2);
 C_b = A_m(2,1);
@@ -117,9 +149,8 @@ D_c = T_42 - T_43*(T_22*Z_b + T_12)/(T_23*Z_b + T_13);
 
 A_C = [A_c B_c; C_c D_c];
 
-%% Final 2x2 matrix of Piezo stack
-
-A_ps = A_C;
+%% Final 2x2 matrix of Piezo stack 
+A_ps = A_C*A_m;
 A = A_ps(1,1);
 B = A_ps(1,2);
 C = A_ps(2,1);
@@ -134,8 +165,8 @@ c=1300;                              % compresisonal wave speed in fluid
 Z_r=S_a*c*rho_2;                     % Acoustic radiation impedance 
 
 
-Z_E = (A*Z_r + B)/(C*Z_r + D);            % electrical input impedance
-V_IL = Z_r/(A*Z_r + B);                   % voltage transfer ratio between input voltage and output force
+Z_E = (A*Z_H + B)/(C*Z_H + D);            % electrical input impedance
+V_IL = Z_H/(A*Z_H + B);                   % voltage transfer ratio between input voltage and output force
 
 
 
