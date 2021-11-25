@@ -53,89 +53,124 @@ Kin_Vis=32*10^-6;
 %% 4 port model matrix - Sittig
 
 
-T_11 = (cos(gamma) - s)/(1-s);
-T_12 = (j*Z_0*(sin(gamma) - 2*c))/(1-s);
-T_13 = -((cos(gamma) - 1)*phi)/(1-s);
+% T_11 = (cos(gamma) - s)/(1-s);
+% T_12 = (j*Z_0*(sin(gamma) - 2*c))/(1-s);
+% T_13 = -((cos(gamma) - 1)*phi)/(1-s);
+% T_14 = 0;
+% T_21 = (j*sin(gamma))/(Z_0*(1-s));
+% T_22 = (cos(gamma) - s)/(1-s);
+% T_23 = -(j*phi*sin(gamma))/(1-s);
+% T_24 = 0;
+% T_31 = 0;
+% T_32 = 0;
+% T_33 = 1;
+% T_34 = 0;
+% T_41 = -(j*sin(gamma))/(Z_0*(1-s)) * phi;
+% T_42 = -((cos(gamma) - 1)*phi)/(1-s);
+% T_43 = (j*omega*C_0)/(1-s);
+% T_44 = 1;
+% 
+% Tn=[T_11 T_12 T_13 T_14; ...
+%     T_21 T_22 T_23 T_24; ...
+%     T_31 T_32 T_33 T_34; ...
+%     T_41 T_42 T_43 T_44];
+% 
+% r_copper = 2.5*10^-3;
+% A_copper = pi*r_copper^2;
+% rho_copper = 8920;
+% c_copper = 3570;
+% d_copper = 0.5*10^-3;
+% v_copper = sqrt(c_copper/rho_copper)
+% 
+% Z_copper = A_copper*rho_copper*c_copper;
+% gamma_copper = 0;
+% 
+% A_copper = [cos(gamma_copper) j*Z_copper*sin(gamma_copper); ...
+%     (j*sin(gamma_copper))/Z_copper cos(gamma_copper)];
+% A_E = 1;
+% B_E = 0;
+% C_E = 0;
+% D_E = 1;
+% 
+% T_intermediate_copper = [A_copper(1,1) A_copper(1,2) 0 0; ...
+%                   A_copper(2,1) A_copper(2,2) 0 0; ...
+%                   0 0 A_E B_E; ...
+%                   0 0 C_E D_E];
+%               
+% rho_FP = 7850;
+% r_FP = 4.5*10^-3;
+% c_FP = 3230;
+% S_FP = pi*r_FP^2;
+% d_FP = 0.5*10^-3;
+% v_FP = sqrt(c_FP/rho_FP);
+% 
+% Z_FP = rho_FP*c_FP*S_FP;
+% gamma_FP = pi*f*d_FP;
+% 
+% A_E_FP = 1;
+% B_E_FP = 1/(omega*1400*eps_0*S_FP/d_FP);
+% C_E_FP = 0;
+% D_E_FP = 1;
+% 
+% A_FP = [cos(gamma_FP) j*Z_FP*sin(gamma_FP); ...
+%     (j*sin(gamma_FP))/Z_FP cos(gamma_FP)];
+% T_intermediate_FP = [A_FP(1,1) A_FP(1,2) 0 0; ...
+%                     A_FP(2,1) A_FP(2,2) 0 0; ...
+%                     0 0 A_E_FP B_E_FP;
+%                     0 0 C_E_FP D_E_FP];
+% 
+% T=(Tn)^2 * T_intermediate_copper^2 * T_intermediate_FP;
+% T_11=Tn(1,1);
+% T_12=Tn(1,2);
+% T_13=Tn(1,3);
+% T_14=Tn(1,4);
+% T_21=Tn(2,1);
+% T_22=Tn(2,2);
+% T_23=Tn(2,3);
+% T_24=Tn(2,4);
+% T_31=Tn(3,1);
+% T_32=Tn(3,2);
+% T_33=Tn(3,3);
+% T_34=Tn(3,4);
+% T_41=Tn(4,1);
+% T_42=Tn(4,2);
+% T_43=Tn(4,3);
+% T_44=Tn(4,4);
+
+f = 0.43*10^6;
+omega = 2*pi*f;
+N = 2;
+j = 1i;
+C_s = S*eps_33/d_n;
+h = h_33;
+Z = S*rho_n*v_n;
+Z_inv = 1/Z;
+theta = omega*d_n/v_n;
+k = 0.66;
+sigma = k^2/theta;
+phi = acos((cos(theta)-sigma*sin(theta))/(1-sigma*sin(theta)));
+R = (sqrt(sin(theta)-2*sigma*(1-cos(theta))))/sin(theta);
+R_inv = 1/R;
+
+
+
+T_11 = cos(N*phi);
+T_12 = -j*Z*R*sin(N*phi);
+T_13 = -h*C_s*tan(0.5*phi)*sin(N*phi);
 T_14 = 0;
-T_21 = (j*sin(gamma))/(Z_0*(1-s));
-T_22 = (cos(gamma) - s)/(1-s);
-T_23 = -(j*phi*sin(gamma))/(1-s);
+T_21 = -j*Z_inv*R_inv*sin(N*phi);
+T_22 = cos(N*phi);
+T_23 = -j*h*C_s*Z_inv*R_inv*tan(0.5*phi)*(cos(N*phi)-(-1)^N);
 T_24 = 0;
 T_31 = 0;
 T_32 = 0;
-T_33 = 1;
+T_33 = (-1)^N;
 T_34 = 0;
-T_41 = -(j*sin(gamma))/(Z_0*(1-s)) * phi;
-T_42 = -((cos(gamma) - 1)*phi)/(1-s);
-T_43 = (j*omega*C_0)/(1-s);
-T_44 = 1;
+T_41 = -j*h*C_s*Z_inv*R_inv*tan(0.5*phi)*(cos(N*phi)-(-1)^N);
+T_42 = -h*C_s*tan(0.5*phi)*sin(N*phi);
+T_43 = j*((N*(-1)^N)*(1+2*sigma*R_inv*tan(0.5*phi))+sigma*R_inv*((tan(0.5*phi))^2)*sin(N*phi))*omega*C_s;
+T_44 = (-1)^N;
 
-Tn=[T_11 T_12 T_13 T_14; ...
-    T_21 T_22 T_23 T_24; ...
-    T_31 T_32 T_33 T_34; ...
-    T_41 T_42 T_43 T_44];
-
-r_copper = 2.5*10^-3;
-A_copper = pi*r_copper^2;
-rho_copper = 8920;
-c_copper = 3570;
-d_copper = 0.5*10^-3;
-v_copper = sqrt(c_copper/rho_copper)
-
-Z_copper = A_copper*rho_copper*c_copper;
-gamma_copper = 0;
-
-A_copper = [cos(gamma_copper) j*Z_copper*sin(gamma_copper); ...
-    (j*sin(gamma_copper))/Z_copper cos(gamma_copper)];
-A_E = 1;
-B_E = 0;
-C_E = 0;
-D_E = 1;
-
-T_intermediate_copper = [A_copper(1,1) A_copper(1,2) 0 0; ...
-                  A_copper(2,1) A_copper(2,2) 0 0; ...
-                  0 0 A_E B_E; ...
-                  0 0 C_E D_E];
-              
-rho_FP = 7850;
-r_FP = 4.5*10^-3;
-c_FP = 3230;
-S_FP = pi*r_FP^2;
-d_FP = 0.5*10^-3;
-v_FP = sqrt(c_FP/rho_FP);
-
-Z_FP = rho_FP*c_FP*S_FP;
-gamma_FP = pi*f*d_FP;
-
-A_E_FP = 1;
-B_E_FP = 1/(omega*1400*eps_0*S_FP/d_FP);
-C_E_FP = 0;
-D_E_FP = 1;
-
-A_FP = [cos(gamma_FP) j*Z_FP*sin(gamma_FP); ...
-    (j*sin(gamma_FP))/Z_FP cos(gamma_FP)];
-T_intermediate_FP = [A_FP(1,1) A_FP(1,2) 0 0; ...
-                    A_FP(2,1) A_FP(2,2) 0 0; ...
-                    0 0 A_E_FP B_E_FP;
-                    0 0 C_E_FP D_E_FP];
-
-T=(Tn)^2 * T_intermediate_copper^2 * T_intermediate_FP;
-T_11=Tn(1,1);
-T_12=Tn(1,2);
-T_13=Tn(1,3);
-T_14=Tn(1,4);
-T_21=Tn(2,1);
-T_22=Tn(2,2);
-T_23=Tn(2,3);
-T_24=Tn(2,4);
-T_31=Tn(3,1);
-T_32=Tn(3,2);
-T_33=Tn(3,3);
-T_34=Tn(3,4);
-T_41=Tn(4,1);
-T_42=Tn(4,2);
-T_43=Tn(4,3);
-T_44=Tn(4,4);
 %% Front and back layers (loaded impedance)
 
 rho_H = 7860;

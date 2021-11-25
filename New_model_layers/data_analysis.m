@@ -1,4 +1,4 @@
-close all; clear all; clc;
+% close all; clear all; clc;
 
 
 ds = tabularTextDatastore('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\newData\project','FileExtensions','.csv');
@@ -79,8 +79,8 @@ ptp_trans2_vec = ptp_trans2_vec./2000;
 mag_trans2 = 20*log10(abs(ptp_trans2_vec));
 
 figure
-subplot(2,1,1); plot(freq_vec,mag_trans2); title('Bode magnitude plot of the second transducer'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+subplot(2,1,1); plot(freq_vec,ptp_trans2_vec); title('Bode magnitude plot of the second transducer'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [V]');
 
 
 
