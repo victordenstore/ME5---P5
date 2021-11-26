@@ -66,8 +66,8 @@ Back_mat_FeC = [cos(gamma_FeC) j*Z_0_FeC*sin(gamma_FeC); ...
 % copper electrode, and between the copper electrode and the backing plate.
 
 rho_glue = 960;  
-c_glue = 3570;    % unsure about this!!
-l_glue = 0.01*10^-3;    % to be varied.
+c_glue = 1220;    % unsure about this!!
+l_glue = 0.06*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
 A_glue = pi*r_Cu^2;
 Z_0_glue = rho_Cu * c_Cu * A_Cu;
@@ -112,10 +112,27 @@ gamma_FeC = pi*f/f_0_FP;
 
 Trans_mat_FP = [cos(gamma_FeC) j*Z_0_FP*sin(gamma_FeC); ...
                 (j*sin(gamma_FeC))/Z_0_FP cos(gamma_FeC)];
+            
+%The housing, simply modelled as a another transmission plate
+            
+rho_house = rho_FeC;  
+c_house = c_FeC;    
+l_house = 3.25*10^-3;    
+r_house = 3.5*10^-3;
+A_house = pi*r_Cu^2;
+Z_0_house = rho_Cu * c_Cu * A_Cu;
+f_0_house = c_Cu/(2*l_Cu);
+gamma_house = pi*f/f_0_Cu;
+
+house_mat = [cos(gamma_house) j*Z_0_house*sin(gamma_house); ...
+               (j*sin(gamma_house))/Z_0_house cos(gamma_house)];
+            
+            
+            
 
 % Multiplication of the transmission piezoelectric inactive layers gives:
 
-Trans_mat = glue_mat*Trans_mat_Cu*glue_mat*Trans_mat_FP;
+Trans_mat = glue_mat*Trans_mat_Cu*glue_mat*Trans_mat_FP*house_mat;
                    
 %% Setting up the matrix describing the active Piezoelectric layer
 

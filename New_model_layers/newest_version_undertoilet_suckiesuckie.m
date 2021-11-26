@@ -55,8 +55,8 @@ end
 
 % the material parameters
 
-rho_FeC = 8000;  % Pure! copper density.
-c_FeC = 5800;    % pure copper speed of sound.
+rho_FeC = 8000;  
+c_FeC = 5800;    
 r_FeC = 2.5*10^-3;
 A_FeC = pi*r_FeC^2;
 Z_0_FeC = rho_FeC * c_FeC * A_FeC;
@@ -75,8 +75,8 @@ Back_mat_FeC(row1:row2,1:2) = [cos(gamma_FeC(j)) j*Z_0_FeC*sin(gamma_FeC(j)); ..
 end
 
 rho_glue = 960;  
-c_glue = 3570;    % unsure about this!!
-l_glue = 0.01*10^-3;    % to be varied.
+c_glue = 1220;    % unsure about this!!
+l_glue = 0.06*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
 A_glue = pi*r_Cu^2;
 Z_0_glue = rho_Cu * c_Cu * A_Cu;
@@ -152,6 +152,26 @@ Trans_mat_FP(row1:row2,1:2) = [cos(gamma_FeC(x)) j*Z_0_FP*sin(gamma_FeC(x)); ...
                 (j*sin(gamma_FeC(x)))/Z_0_FP cos(gamma_FeC(x))];
 end
 
+%The housing, simply modelled as a another transmission plate
+
+rho_house = rho_FeC;  
+c_house = c_FeC;    
+l_house = 3.25*10^-3;    
+r_house = 3.5*10^-3;
+A_house = pi*r_Cu^2;
+Z_0_house = rho_Cu * c_Cu * A_Cu;
+f_0_house = c_Cu/(2*l_Cu);
+gamma_house = pi*f/f_0_Cu;
+
+house_mat = zeros(2*length(f),2);
+
+for kla = 1:length(f)
+    row1 = 2*kla-1;
+    row2 = 2*kla;
+    
+house_mat(row1:row2,1:2) = [cos(gamma_house(kla)) j*Z_0_house*sin(gamma_house(kla)); ...
+               (j*sin(gamma_house(kla)))/Z_0_house cos(gamma_house(kla))];
+end
 % Multiplication of the transmission piezoelectric inactive layers gives:
 Trans_mat = zeros(2*length(f),2);
 
@@ -160,7 +180,7 @@ row1 = 2*xx-1;
 row2 = 2*xx;
 
 Trans_mat(row1:row2,1:2) = glue_mat(row1:row2,1:2)*Trans_mat_Cu(row1:row2,1:2) ...
-    * glue_mat(row1:row2,1:2)*Trans_mat_FP(row1:row2,1:2);
+    * glue_mat(row1:row2,1:2)*Trans_mat_FP(row1:row2,1:2)*house_mat(row1:row2,1:2);
 end
                    
 %% Setting up the matrix describing the active Piezoelectric layer
