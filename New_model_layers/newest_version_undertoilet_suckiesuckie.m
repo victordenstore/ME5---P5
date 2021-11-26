@@ -41,11 +41,11 @@ gamma_Cu = pi*f/f_0_Cu;
 % The matrix
 Back_mat_Cu = zeros(2*length(f),2);
 
-for i = 1:length(f)
-row1 = 2*i-1;
-row2 = 2*i;
-Back_mat_Cu(row1:row2,1:2) = [cos(gamma_Cu(i)) j*Z_0_Cu*sin(gamma_Cu(i)); ...
-               (j*sin(gamma_Cu(i)))/Z_0_Cu cos(gamma_Cu(i))];
+for ja = 1:length(f)
+row1 = 2*ja-1;
+row2 = 2*ja;
+Back_mat_Cu(row1:row2,1:2) = [cos(gamma_Cu(ja)) j*Z_0_Cu*sin(gamma_Cu(ja)); ...
+               (j*sin(gamma_Cu(ja)))/Z_0_Cu cos(gamma_Cu(ja))];
 end
           
            
@@ -66,12 +66,12 @@ gamma_FeC = pi*f/f_0_FeC;
 % the matrix
 Back_mat_FeC = zeros(2*length(f),2);
 
-for j = 1:length(f)
-row1 = 2*j-1;
-row2 = 2*j;
+for jj = 1:length(f)
+row1 = 2*jj-1;
+row2 = 2*jj;
   
-Back_mat_FeC(row1:row2,1:2) = [cos(gamma_FeC(j)) j*Z_0_FeC*sin(gamma_FeC(j)); ...
-                (j*sin(gamma_FeC(j)))/Z_0_FeC cos(gamma_FeC(j))];
+Back_mat_FeC(row1:row2,1:2) = [cos(gamma_FeC(jj)) j*Z_0_FeC*sin(gamma_FeC(jj)); ...
+                (j*sin(gamma_FeC(jj)))/Z_0_FeC cos(gamma_FeC(jj))];
 end
 
 rho_glue = 960;  
@@ -158,10 +158,10 @@ rho_house = rho_FeC;
 c_house = c_FeC;    
 l_house = 3.25*10^-3;    
 r_house = 3.5*10^-3;
-A_house = pi*r_Cu^2;
-Z_0_house = rho_Cu * c_Cu * A_Cu;
-f_0_house = c_Cu/(2*l_Cu);
-gamma_house = pi*f/f_0_Cu;
+A_house = pi*r_house^2;
+Z_0_house = rho_house * c_house * A_house;
+f_0_house = c_house/(2*l_house);
+gamma_house = pi*f/f_0_house;
 
 house_mat = zeros(2*length(f),2);
 
@@ -298,6 +298,6 @@ subplot(2,1,2); plot(f,phase_admittance); title('Phase plot of the admittance');
     xlabel('frequency [Hz]'); ylabel('phase [degree]');
 
 figure
-plot(f,susceptance); title('Bode magnitude plot of the susceptance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+plot(f,imag(Z_E)); title('Bode magnitude plot of the susceptance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); ylim([-0.2 0.2]*10^6)
 

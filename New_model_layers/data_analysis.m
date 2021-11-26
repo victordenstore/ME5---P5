@@ -1,4 +1,4 @@
-% close all; clear all; clc;
+close all; clear all; clc;
 
 
 ds = tabularTextDatastore('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\newData\project','FileExtensions','.csv');
@@ -76,7 +76,7 @@ susceptance = imag(admittance);
 
 figure
 subplot(2,1,1); plot(freq_vec,mag_impedance); title('Bode magnitude plot of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); ylim([40 90])
 subplot(2,1,2); plot(freq_vec,phase_impedance); title('Phase plot of the impedance'); ...
     xlabel('frequency [Hz]'); ylabel('phase [degree]');
 

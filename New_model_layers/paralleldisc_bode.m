@@ -19,7 +19,7 @@ clear all; close all; clc;
 
 %% Parameter initialization
 
-f = linspace(1,2*10^6,100000);      
+f = linspace(1,2*10^6,10000);      
 omg = 2*pi*f;
 j = 1i;
 %% Setting up the backing material matrix
@@ -66,12 +66,12 @@ gamma_FeC = pi*f/f_0_FeC;
 % the matrix
 Back_mat_FeC = zeros(2*length(f),2);
 
-for j = 1:length(f)
-row1 = 2*j-1;
-row2 = 2*j;
+for is = 1:length(f)
+row1 = 2*is-1;
+row2 = 2*is;
   
-Back_mat_FeC(row1:row2,1:2) = [cos(gamma_FeC(j)) j*Z_0_FeC*sin(gamma_FeC(j)); ...
-                (j*sin(gamma_FeC(j)))/Z_0_FeC cos(gamma_FeC(j))];
+Back_mat_FeC(row1:row2,1:2) = [cos(gamma_FeC(is)) j*Z_0_FeC*sin(gamma_FeC(is)); ...
+                (j*sin(gamma_FeC(is)))/Z_0_FeC cos(gamma_FeC(is))];
 end
 
 rho_glue = 960;  
@@ -287,13 +287,88 @@ phase_tf = rad2deg(angle(V_IL));
 mag_impedance = 20*log10(abs(Z_E));
 mag_tf = 20*log10(abs(V_IL));
 
+
+ds = tabularTextDatastore('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\newData\project','FileExtensions','.csv');
+T = readall(ds);
+ind_freq = 13:94:93919;
+ind_phase = 27:94:93933;
+ind_ptp1 = 55:94:93961;
+ind_ptp2 = 69:94:93975;
+ind_ptp4 = 83:94:93989;
+frequencies = T(ind_freq,1);
+phase_shift = T(ind_phase,1);
+ptp_voltage = T(ind_ptp1,1);
+ptp_current = T(ind_ptp2,1);
+ptp_trans2 = T(ind_ptp4,1);
+
+freq = table2array(frequencies);
+freq = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),freq);
+phase_shift = table2array(phase_shift);
+phase_shift = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),phase_shift);
+ptp_voltage = table2array(ptp_voltage);
+ptp_voltage = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),ptp_voltage);
+ptp_current = table2array(ptp_current);
+ptp_current = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),ptp_current);
+ptp_trans2 = table2array(ptp_trans2);
+ptp_trans2 = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),ptp_trans2);
+
+es = tabularTextDatastore('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\newData\projectcontinued');
+S = readall(es);
+
+ind_freq1 = 13:94:37613;
+ind_phase1 = 27:94:37627;
+ind_ptp1 = 55:94:37655;
+ind_ptp2 = 69:94:37669;
+ind_ptp4 = 83:94:37683;
+frequencies1 = S(ind_freq1,1);
+phase_shift1 = S(ind_phase1,1);
+ptp_voltage1 = S(ind_ptp1,1);
+ptp_current1 = S(ind_ptp2,1);
+ptp_trans21 =  S(ind_ptp4,1);
+
+freq1 = table2array(frequencies1);
+freq1 = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),freq1);
+phase_shift1 = table2array(phase_shift1);
+phase_shift1 = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),phase_shift1);
+ptp_voltage1 = table2array(ptp_voltage1);
+ptp_voltage1 = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),ptp_voltage1);
+ptp_current1 = table2array(ptp_current1);
+ptp_current1 = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),ptp_current1);
+ptp_trans21 = table2array(ptp_trans21);
+ptp_trans21 = cellfun(@(x)str2double(regexp(x,'\d*\.\d*','match')),ptp_trans21);
+
+freq_vec = [freq; freq1];
+multiplyer = freq_vec(1:901)*1000;
+multiplyer2 = freq_vec(902:end)*1000000;
+freq_vec = [multiplyer; multiplyer2];
+phase_shift_vec = [phase_shift; phase_shift1];
+ptp_voltage_vec = [ptp_voltage; ptp_voltage1];
+ptp_current_vec = [ptp_current; ptp_current1];
+ptp_trans2_vec = [ptp_trans2; ptp_trans21];
+
+j = 1i;
+current_phasor_amp = ptp_current_vec./2000;             % amplitude in mA.
+current_angle = deg2rad(phase_shift_vec);
+current_phasor = current_phasor_amp.*exp(j*current_angle);
+
+impedance_phasor = (ptp_voltage_vec./2)./current_phasor;
+
+phase_impedance2 = rad2deg(angle(impedance_phasor));
+mag_impedance2 = 20*log10(abs(impedance_phasor));
+
+admittance2 = 1./impedance_phasor;
+phase_admittance2 = rad2deg(angle(admittance2));
+mag_admittance2 = 20*log10(abs(admittance2));
+susceptance2 = imag(admittance2);
+
 %[pks1 ind1] = findpeaks(mag_impedance,'MinPeakDistance',5000,'MinPeakProminence',0.01);
 %plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
 figure
-subplot(2,1,1); plot(f,mag_impedance); title('Bode magnitude plot of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); 
-subplot(2,1,2); plot(f,phase_impedance); title('Phase plot of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('phase [degree]');
+subplot(2,1,1);plot(f,mag_impedance,'g'); hold on; plot(freq_vec,mag_impedance2,'r'); title('Bode magnitude plot of the impedance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); ylim([40 90])
+conversion_vec = 180*ones(length(freq_vec),1);
+subplot(2,1,2); plot(f,phase_impedance,'g'); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r'); title('Phase plot of the impedance'); ...
+    xlabel('frequency [Hz]'); ylabel('phase [degree]'); ylim([-100 30])
 
 
 % [pks ind] = findpeaks(mag_tf,'MinPeakDistance',5000,'MinPeakProminence',0.01);
@@ -305,12 +380,12 @@ subplot(2,1,2); plot(f,phase_tf); title('Phase plot of the transfer function V_{
     xlabel('frequency [Hz]'); ylabel('phase [degree]');
 
 figure
-subplot(2,1,1); plot(f,mag_admittance); title('Bode magnitude plot of the admittance'); ...
+subplot(2,1,1); plot(f,mag_admittance','g'); hold on; plot(freq_vec,mag_admittance2,'r'); title('Bode magnitude plot of the admittance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
-subplot(2,1,2); plot(f,phase_admittance); title('Phase plot of the admittance'); ...
+subplot(2,1,2); plot(f,phase_admittance,'g'); hold on; plot(freq_vec,phase_admittance2,'r'); title('Phase plot of the admittance'); ...
     xlabel('frequency [Hz]'); ylabel('phase [degree]');
 
 figure
-plot(f,susceptance); title('Bode magnitude plot of the susceptance'); ...
+plot(f,susceptance,'g'); hold on; plot(freq_vec,susceptance2,'r'); title('Bode magnitude plot of the susceptance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
