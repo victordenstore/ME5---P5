@@ -11,7 +11,7 @@ a=2.5*10^-3;                     % Radius of the piezoelectric plate
 S=pi*a^2;                        % Piezoelectric surface area
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
-d=2*10^-3;                       % plate thickness
+d=2*2*10^-3;                       % plate thickness
 rho_4=7860;                          % Density of plain carbon steel 
 c_3=3230;                            % Speed of wave in plain carbon steel
 Z_b=rho_4*c_3*S;                         % Acoustic impedance of the backing plate
@@ -99,6 +99,18 @@ nexttile
 phase1 = rad2deg(angle(Z_Ae_in));
 plot(w/(2*pi),phase1)
 
+admittance = 1./Z_Ae_in;
+phase_ad1 = rad2deg(angle(admittance));
+mag_ad = 20*log10(abs(admittance));
+
+figure
+tiledlayout(2,1);
+nexttile
+mag_ad =  20*log10(abs(admittance))
+plot(w/(2*pi),mag_ad,'g')
+nexttile
+plot(w/(2*pi),phase_ad1)
+
 
 M = readmatrix('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\FreqSweepSkabelon.xlsx')
 
@@ -117,10 +129,14 @@ end
 phase1 = rad2deg(angle(Z_in));
 Z_in_mag = 20*log10(abs(Z_in));
 
+
+
 figure
 tiledlayout(2,1); nexttile
 plot(M(:,1),Z_in_mag); title('Impedance magnitude'); xlabel('frequency [kHz]'); ylabel('magnitude [DB]');
 nexttile; plot(M(:,1),-phase1); title('Impedance angle'); xlabel('frequency [kHz]'); ylabel('angle [degree]');
+
+
 
 %% 2nd transducer, pressure wave magnitude calculation
 
