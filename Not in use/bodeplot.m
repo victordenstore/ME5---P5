@@ -11,7 +11,7 @@ a=2.5*10^-3;                     % Radius of the piezoelectric plate
 S=pi*a^2;                        % Piezoelectric surface area
 rho=7.8*10^3;                    % Piezoelectric plate density
 c_33=16.6*10^10;                 % Elastic constant of the plate
-d=2*2*10^-3;                       % plate thickness
+d=2*10^-3;                       % plate thickness
 rho_4=7860;                          % Density of plain carbon steel 
 c_3=3230;                            % Speed of wave in plain carbon steel
 Z_b=rho_4*c_3*S;                         % Acoustic impedance of the backing plate
@@ -85,19 +85,24 @@ S_FV = 20*log10(abs(S_FV))
 figure
 tiledlayout(2,1);
 nexttile
-plot(w/(2*pi),S_FV,'g')
+plot(w/(2*pi*10^6),S_FV,'g');title('Bode magnitude plot of S_(FV)'); ...
+    xlabel('Frequency [MHz]'); ylabel('magnitude [DB]');
 ylim([-75 -25])
 nexttile
-plot(w/(2*pi),phase)
+plot(w/(2*pi*10^6),phase);xlabel('Frequency [MHz]'); ylabel('Phase [deg]')
+ylim([-200 200])
 
 figure
 tiledlayout(2,1);
 nexttile
 Z_Ae_in1 =  20*log10(abs(Z_Ae_in))
-plot(w/(2*pi),Z_Ae_in1,'g')
+plot(w/(2*pi*10^6),Z_Ae_in1,'g');title('Bode magnitude plot of the impedance'); ...
+    xlabel('Frequency [MHz]'); ylabel('magnitude [DB]');
+ylim([50 125])
 nexttile
 phase1 = rad2deg(angle(Z_Ae_in));
-plot(w/(2*pi),phase1)
+plot(w/(2*pi*10^6),phase1);xlabel('Frequency [MHz]'); ylabel('Phase [deg]')
+
 
 admittance = 1./Z_Ae_in;
 phase_ad1 = rad2deg(angle(admittance));
@@ -107,9 +112,11 @@ figure
 tiledlayout(2,1);
 nexttile
 mag_ad =  20*log10(abs(admittance))
-plot(w/(2*pi),mag_ad,'g')
+plot(w/(2*pi*10^-6),mag_ad,'g');title('Bode magnitude plot of the admittance'); ...
+    xlabel('Frequency [MHz]'); ylabel('magnitude [DB]');
+ylim([-100 -50])
 nexttile
-plot(w/(2*pi),phase_ad1)
+plot(w/(2*pi*10^6),phase_ad1);xlabel('Frequency [MHz]'); ylabel('Phase [deg]')
 
 
 M = readmatrix('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\FreqSweepSkabelon.xlsx')
@@ -133,8 +140,8 @@ Z_in_mag = 20*log10(abs(Z_in));
 
 figure
 tiledlayout(2,1); nexttile
-plot(M(:,1),Z_in_mag); title('Impedance magnitude'); xlabel('frequency [kHz]'); ylabel('magnitude [DB]');
-nexttile; plot(M(:,1),-phase1); title('Impedance angle'); xlabel('frequency [kHz]'); ylabel('angle [degree]');
+plot(M(:,1),Z_in_mag); title('Impedance magnitude'); xlabel('Frequency [kHz]'); ylabel('magnitude [DB]');
+nexttile; plot(M(:,1),-phase1); title('Impedance angle'); xlabel('Frequency [kHz]'); ylabel('angle [degree]');
 
 
 
