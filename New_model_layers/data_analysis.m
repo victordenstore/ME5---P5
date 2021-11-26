@@ -69,6 +69,11 @@ impedance_phasor = (ptp_voltage_vec./2)./current_phasor;
 phase_impedance = rad2deg(angle(impedance_phasor));
 mag_impedance = 20*log10(abs(impedance_phasor));
 
+admittance = 1./impedance_phasor;
+phase_admittance = rad2deg(angle(admittance));
+mag_admittance = 20*log10(abs(admittance));
+susceptance = imag(admittance);
+
 figure
 subplot(2,1,1); plot(freq_vec,mag_impedance); title('Bode magnitude plot of the impedance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
@@ -82,5 +87,14 @@ figure
 subplot(2,1,1); plot(freq_vec,ptp_trans2_vec); title('Bode magnitude plot of the second transducer'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [V]');
 
+figure
+subplot(2,1,1); plot(freq_vec,mag_admittance); title('Bode magnitude plot of the admittance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+subplot(2,1,2); plot(freq_vec,phase_admittance); title('Phase plot of the admittance'); ...
+    xlabel('frequency [Hz]'); ylabel('phase [degree]');
+
+figure
+plot(freq_vec,susceptance); title('Bode magnitude plot of the susceptance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
 

@@ -19,7 +19,7 @@ clear all; close all; clc;
 
 %% Parameter initialization
 
-f = linspace(1,40*10^6,1000);      
+f = linspace(1,2*10^6,1000);      
 omg = 2*pi*f;
 j = 1i;
 %% Setting up the backing material matrix
@@ -73,7 +73,26 @@ row2 = 2*j;
 Back_mat_FeC(row1:row2,1:2) = [cos(gamma_FeC(j)) j*Z_0_FeC*sin(gamma_FeC(j)); ...
                 (j*sin(gamma_FeC(j)))/Z_0_FeC cos(gamma_FeC(j))];
 end
-            
+
+rho_glue = 960;  
+c_glue = 3570;    % unsure about this!!
+l_glue = 0.01*10^-3;    % to be varied.
+r_glue = 2.5*10^-3;
+A_glue = pi*r_Cu^2;
+Z_0_glue = rho_Cu * c_Cu * A_Cu;
+f_0_glue = c_Cu/(2*l_Cu);
+gamma_glue = pi*f/f_0_Cu;
+
+glue_mat = zeros(2*length(f),2);
+
+for han = 1:length(f)
+row1 = 2*han-1;
+row2 = 2*han;
+
+glue_mat(row1:row2,1:2) = [cos(gamma_glue(han)) j*Z_0_glue*sin(gamma_glue(han)); ...
+               (j*sin(gamma_glue(han)))/Z_0_glue cos(gamma_glue(han))];
+end
+          
 % The matrices are multiplied and the total impedance Z_b of the backing
 % layers is obtained.
 Back_mat = zeros(2*length(f),2);
@@ -83,7 +102,8 @@ for ii = 1:length(f)
 row1 = 2*ii-1;
 row2 = 2*ii;
     
-Back_mat(row1:row2,1:2) = Back_mat_Cu(row1:row2,1:2)*Back_mat_FeC(row1:row2,1:2);
+Back_mat(row1:row2,1:2) = glue_mat(row1:row2,1:2)*Back_mat_Cu(row1:row2,1:2) ...
+    *glue_mat(row1:row2,1:2)*Back_mat_FeC(row1:row2,1:2);
 Back_mat_current = Back_mat(row1:row2,1:2);
 A_b = Back_mat_current(1,1);
 B_b = Back_mat_current(1,2);
@@ -139,7 +159,8 @@ for xx = 1:length(f)
 row1 = 2*xx-1;
 row2 = 2*xx;
 
-Trans_mat(row1:row2,1:2) = Trans_mat_Cu(row1:row2,1:2)*Trans_mat_FP(row1:row2,1:2);
+Trans_mat(row1:row2,1:2) = glue_mat(row1:row2,1:2)*Trans_mat_Cu(row1:row2,1:2) ...
+    * glue_mat(row1:row2,1:2)*Trans_mat_FP(row1:row2,1:2);
 end
                    
 %% Setting up the matrix describing the active Piezoelectric layer

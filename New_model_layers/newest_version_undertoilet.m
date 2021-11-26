@@ -62,10 +62,25 @@ gamma_FeC = pi*f/f_0_FeC;
 Back_mat_FeC = [cos(gamma_FeC) j*Z_0_FeC*sin(gamma_FeC); ...
                 (j*sin(gamma_FeC))/Z_0_FeC cos(gamma_FeC)];
             
+% Setting up the matrices for the additional glue layers between the back face of the piezoelectric element and the 
+% copper electrode, and between the copper electrode and the backing plate.
+
+rho_glue = 960;  
+c_glue = 3570;    % unsure about this!!
+l_glue = 0.01*10^-3;    % to be varied.
+r_glue = 2.5*10^-3;
+A_glue = pi*r_Cu^2;
+Z_0_glue = rho_Cu * c_Cu * A_Cu;
+f_0_glue = c_Cu/(2*l_Cu);
+gamma_glue = pi*f/f_0_Cu;
+
+glue_mat = [cos(gamma_glue) j*Z_0_glue*sin(gamma_glue); ...
+               (j*sin(gamma_glue))/Z_0_glue cos(gamma_glue)];
+            
 % The matrices are multiplied and the total impedance Z_b of the backing
 % layers is obtained.
 
-Back_mat = Back_mat_Cu*Back_mat_FeC;
+Back_mat = glue_mat*Back_mat_Cu*glue_mat*Back_mat_FeC;
 A_b = Back_mat(1,1);
 B_b = Back_mat(1,2);
 C_b = Back_mat(2,1);
@@ -100,7 +115,7 @@ Trans_mat_FP = [cos(gamma_FeC) j*Z_0_FP*sin(gamma_FeC); ...
 
 % Multiplication of the transmission piezoelectric inactive layers gives:
 
-Trans_mat = Trans_mat_Cu*Trans_mat_FP;
+Trans_mat = glue_mat*Trans_mat_Cu*glue_mat*Trans_mat_FP;
                    
 %% Setting up the matrix describing the active Piezoelectric layer
 
