@@ -139,8 +139,9 @@ Kin_Vis=32*10^-6;
 
 f = 0.43*10^6;
 omega = 2*pi*f;
-N = 2;
 j = 1i;
+
+N = 2;
 C_s = S*eps_33/d_n;
 h = h_33;
 Z = S*rho_n*v_n;
