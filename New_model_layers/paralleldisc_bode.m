@@ -118,7 +118,7 @@ end
 
 % The intermediate layers in the transmission direction are obtained in the
 % same way. Again starting with the intermediate layer closest to the
-% peizoelectric active layer.
+% piezoelectric active layer.
 
 % The material parameters were already given before!
 Trans_mat_Cu = zeros(length(f),2);
@@ -273,19 +273,23 @@ C = Final_trans_mat1(2,1);
 D = Final_trans_mat1(2,2);
 
 Z_FP = Z_0_FeC;
-Z_E(g) = (A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
+Z_E(g) = (A*Z_FP + B)/(C*Z_FP + D) * 2;            % electrical input impedance
 V_IL(g) = Z_FP/(A*Z_FP + B);                   % voltage transfer ratio between input voltage and output force
 end
 
 admittance = 1./Z_E;
 susceptance = imag(admittance);
+conductance = real(admittance);
 phase_admittance = rad2deg(angle(admittance));
 mag_admittance = 20*log10(abs(admittance));
+mag_conductance = 20*log10(abs(conductance));
 
 phase_impedance = rad2deg(angle(Z_E));
 phase_tf = rad2deg(angle(V_IL));
+phase_resistance = rad2deg(angle(real(Z_E)));
 mag_impedance = 20*log10(abs(Z_E));
 mag_tf = 20*log10(abs(V_IL));
+mag_resistance = 20*log10(abs(real(Z_E)));
 
 
 ds = tabularTextDatastore('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\newData\project','FileExtensions','.csv');
@@ -354,12 +358,17 @@ current_phasor = current_phasor_amp.*exp(j*current_angle);
 impedance_phasor = (ptp_voltage_vec./2)./current_phasor;
 
 phase_impedance2 = rad2deg(angle(impedance_phasor));
+phase_resistance2 = rad2deg(angle(real(impedance_phasor)));
 mag_impedance2 = 20*log10(abs(impedance_phasor));
+mag_resistance2 = 20*log10(abs(real(impedance_phasor)));
+
 
 admittance2 = 1./impedance_phasor;
 phase_admittance2 = rad2deg(angle(admittance2));
 mag_admittance2 = 20*log10(abs(admittance2));
 susceptance2 = imag(admittance2);
+conductance2 = real(admittance2);
+mag_conductance2 = 20*log10(abs(conductance2));
 
 %[pks1 ind1] = findpeaks(mag_impedance,'MinPeakDistance',5000,'MinPeakProminence',0.01);
 %plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
@@ -382,10 +391,19 @@ subplot(2,1,2); plot(f,phase_tf); title('Phase plot of the transfer function V_{
 figure
 subplot(2,1,1); plot(f,mag_admittance','g'); hold on; plot(freq_vec,mag_admittance2,'r'); title('Bode magnitude plot of the admittance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
-subplot(2,1,2); plot(f,phase_admittance,'g'); hold on; plot(freq_vec,phase_admittance2,'r'); title('Phase plot of the admittance'); ...
+subplot(2,1,2); plot(f,phase_admittance,'g'); hold on; plot(freq_vec,-phase_admittance2,'r'); title('Phase plot of the admittance'); ...
     xlabel('frequency [Hz]'); ylabel('phase [degree]');
 
 figure
 plot(f,susceptance,'g'); hold on; plot(freq_vec,susceptance2,'r'); title('Bode magnitude plot of the susceptance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
+figure
+semilogy(f,mag_conductance); hold on; semilogy(freq_vec,mag_conductance2); title('magnitude plot of the conductance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+
+figure
+semilogy(f,mag_resistance); hold on; semilogy(freq_vec,mag_resistance2); title('magnitude plot of the conductance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+
+ 
