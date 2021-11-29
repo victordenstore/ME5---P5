@@ -19,9 +19,10 @@ clear all; close all; clc;
 
 %% Parameter initialization
 
-f = linspace(1,2*10^6,1000);      
+f = linspace(1,2*10^6,1000); 
+
 omg = 2*pi*f;
-j = 1i;
+j = sqrt(-1);
 %% Setting up the backing material matrix
 
 % First the layer closest to the piezoelectric layer, hence the copper
@@ -78,10 +79,10 @@ rho_glue = 960;
 c_glue = 1220;    % unsure about this!!
 l_glue = 0.06*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
-A_glue = pi*r_Cu^2;
-Z_0_glue = rho_Cu * c_Cu * A_Cu;
-f_0_glue = c_Cu/(2*l_Cu);
-gamma_glue = pi*f/f_0_Cu;
+A_glue = pi*r_glue^2;
+Z_0_glue = rho_glue * c_glue * A_glue;
+f_0_glue = c_glue/(2*l_glue);
+gamma_glue = pi*f/f_0_glue;
 
 glue_mat = zeros(2*length(f),2);
 
@@ -204,16 +205,16 @@ phi = k_pz *sqrt(Z_0_pz*C_0_pz*omg_0_pz/pi);
 
 
 z_b = Z_b/Z_0_pz;
-Q = cos(gamma_pz) - 1 + j*z_b.*sin(gamma_pz);
-pz_frac = 1./(phi.*Q);
+Q1 = (cos(gamma_pz) - 1);
+Q2 =  j*z_b(:);
+Q3 = Q2.*sin(gamma_pz(:));
+Q = Q1(:)+Q3;
+pz_frac = 1./(phi*Q);
 
 pz_mat_1_12 = (j*phi^2)./(omg*C_0_pz);
 pz_mat_1_21 = j*omg*C_0_pz;
 
-pz_mat_2_11 = cos(gamma_pz)+j*z_b.*sin(gamma_pz);
-pz_mat_2_12 = Z_0_pz*(z_b.*cos(gamma_pz)+j*sin(gamma_pz));
-pz_mat_2_21 = (j*sin(gamma_pz))/Z_0_pz;
-pz_mat_2_22 = 2*(cos(gamma_pz)-1)+j*z_b.*sin(gamma_pz);
+
 
 
 pz_mat_1 = zeros(2*length(f),2);
@@ -226,8 +227,13 @@ row2 = 2*y;
 pz_mat_1(row1:row2,1:2) = [1 pz_mat_1_12(y); ...           % Revisit as the fraction of entry 2,1 is not clear!!
             pz_mat_1_21(y) 0];
 pz_mat_1_current = pz_mat_1(row1:row2,1:2);
-pz_mat_2(row1:row2,1:2) = [pz_mat_2_11(y) pz_mat_2_12(y); ...
-            pz_mat_2_21(y) pz_mat_2_22(y)];
+
+pz_mat_2_11 = cos(gamma_pz(y))+j*z_b(y).*sin(gamma_pz(y));
+pz_mat_2_12 = Z_0_pz*(z_b(y).*cos(gamma_pz(y))+j*sin(gamma_pz(y)));
+pz_mat_2_21 = (j*sin(gamma_pz(y)))/Z_0_pz;
+pz_mat_2_22 = 2*(cos(gamma_pz(y))-1)+j*z_b(y).*sin(gamma_pz(y));
+pz_mat_2(row1:row2,1:2) = [pz_mat_2_11 pz_mat_2_12; ...
+            pz_mat_2_21 pz_mat_2_22];
 pz_mat_2_current = pz_mat_2(row1:row2,1:2);
         
 pz_mat(row1:row2,1:2) = pz_frac(y)*pz_mat_1_current*pz_mat_2_current;
