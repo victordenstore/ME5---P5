@@ -5,8 +5,8 @@ clc;
 x=0.0000042;
 
 %% intialization
-f = 1*10^6;
-w=linspace(1,4*pi*f,10000); % System frequency in rad/s, w=linspace(2.3064*pi*f,2.3068*pi*f,10000); 
+f = linspace(1,2*10^6,1000);
+w=2*pi*f; % System frequency in rad/s, w=linspace(2.3064*pi*f,2.3068*pi*f,10000); 
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 S=pi*a^2;                        % Piezoelectric surface area
 rho=7.8*10^3;                    % Piezoelectric plate density
@@ -24,7 +24,7 @@ c=1300;                          % compresisonal wave speed in fluid
 h_33= d_33/(s_33*epsilon_33);    % Piezoelectric stiffness constant for the plate
 v_o=sqrt(c_33/rho);              % compressional wave speed from piezoelectric
 k=w/v_o;                         % wave number for the peizoelectric plate
-C_o=2*S*epsilon_33/(2*10^-3);               % the clamped capacitance of the plate
+C_o=S*epsilon_33/(d);               % the clamped capacitance of the plate
 n=h_33*C_o;                      % A given constant
 S_a=S;                           % effective face area of the transducer
 rho_2=857;                       % density of the fluid
@@ -49,32 +49,35 @@ T_A_21 = zeros(length(w),1);
 T_A_22 = zeros(length(w),1);
 multiply1 = zeros(length(w),1);
 T_A = zeros(2*length(w),2);
+T_A_E = zeros(2*length(w),2);
 S_A_vl = zeros(length(w),1);
 Z_Ae_in = zeros(length(w),1);
 S_FV  = zeros(length(w),1);
+T_A_final = zeros(2*length(w),2);
 
 
 
-
-for i = 1:length(w)
+for nn = 1:length(w)
     
-    boy = 2*i-1;
-    boy1 = 2*i;
-multiply1(i) = 1 / (Z_b - 1i*Z_o*tan(k(i)*d/2));
-T_A_11(i) = (Z_b + 1i*Z_o*cot(k(i)*d))/n + n/(1i*w(i)*C_o);
-T_A_12(i) = ((Z_o)^2+1i*Z_o*Z_b*cot(k(i)*d))/n + n*(Z_b - 2*1i*Z_o*tan(k(i)*d/2))/(1i*w(i)*C_o); 
-T_A_21(i) = -1i*w(i)*C_o*(Z_b+1i*Z_o*cot(k(i)*d));
-T_A_22(i) = -1i*w(i)*C_o*((Z_o)^2 + 1i*Z_o*Z_b*cot(k(i)*d));
-T_A(boy:boy1,1:2) = multiply1(i) * [T_A_11(i) T_A_12(i); T_A_21(i) T_A_22(i)];
-TAl_matrix(boy:boy1,1:2)=[cos(k_2(i)*d_2) -1i*Z_m*sin(k_2(i)*d_2); (-1i*sin(k_2(i)*d_2))/Z_m cos(k_2(i)*d_2)]; 
+    boy = 2*nn-1;
+    boy1 = 2*nn;
+multiply1(nn) = 1 / (Z_b - 1i*Z_o*tan(k(nn)*d/2));
+T_A_11(nn) = (Z_b + 1i*Z_o*cot(k(nn)*d));
+T_A_12(nn) = ((Z_o)^2+1i*Z_o*Z_b*cot(k(nn)*d)); 
+T_A_21(nn) = 1;
+T_A_22(nn) = Z_b - 2*1i*Z_o*tan(k(nn)*d/2);
+T_A_E(boy:boy1,1:2) = [1/n n./(1i*w(nn)*C_o); -1i*w(nn)*C_o 0];
+T_A(boy:boy1,1:2) = multiply1(nn) * [T_A_11(nn) T_A_12(nn); T_A_21(nn) T_A_22(nn)];
+TAl_matrix(boy:boy1,1:2)=[cos(k_2(nn)*d_2) -1i*Z_m*sin(k_2(nn)*d_2); (-1i*sin(k_2(nn)*d_2))/Z_m cos(k_2(nn)*d_2)]; 
 
 Z_Aa_r = rho_2*c*S_a;
-T_A = T_A(boy:boy1,1:2)*TAl_matrix(boy:boy1,1:2);
-S_A_vl(i) = 1/(Z_Aa_r*T_A(2,1) + T_A(2,2));
+T_A_final(boy:boy1,1:2) = T_A_E(boy:boy1,1:2)*T_A(boy:boy1,1:2)*TAl_matrix(boy:boy1,1:2);
+T_A_final1 = T_A_final(boy:boy1,1:2);
+S_A_vl(nn) = 1/(Z_Aa_r*T_A_final1(2,1) + T_A_final1(2,2));
 
-Z_Ae_in(i) = (Z_Aa_r*T_A(1,1) + T_A(1,2))/(Z_Aa_r*T_A(2,1) + T_A(2,2))+1i*w(i)*4.34*10^-6;
+Z_Ae_in(nn) = (Z_Aa_r*T_A_final1(1,1) + T_A_final1(1,2))/(Z_Aa_r*T_A_final1(2,1) + T_A_final1(2,2));
 
-S_FV(i) = Z_Aa_r * S_A_vl(i)/Z_Ae_in(i);
+S_FV(nn) = Z_Aa_r * S_A_vl(nn)/Z_Ae_in(nn);
 end
 
 phase = rad2deg(angle(S_FV));
