@@ -78,10 +78,10 @@ rho_glue = 960;
 c_glue = 1220;    % unsure about this!!
 l_glue = 0.06*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
-A_glue = pi*r_Cu^2;
-Z_0_glue = rho_Cu * c_Cu * A_Cu;
-f_0_glue = c_Cu/(2*l_Cu);
-gamma_glue = pi*f/f_0_Cu;
+A_glue = pi*r_glue^2;
+Z_0_glue = rho_glue * c_glue * A_glue;
+f_0_glue = c_glue/(2*l_glue);
+gamma_glue = pi*f/f_0_glue;
 
 glue_mat = zeros(2*length(f),2);
 
@@ -158,10 +158,10 @@ rho_house = rho_FeC;
 c_house = c_FeC;    
 l_house = 3.25*10^-3;    
 r_house = 3.5*10^-3;
-A_house = pi*r_Cu^2;
-Z_0_house = rho_Cu * c_Cu * A_Cu;
-f_0_house = c_Cu/(2*l_Cu);
-gamma_house = pi*f/f_0_Cu;
+A_house = pi*r_house^2;
+Z_0_house = rho_house * c_house * A_house;
+f_0_house = c_house/(2*l_house);
+gamma_house = pi*f/f_0_house;
 
 house_mat = zeros(2*length(f),2);
 
@@ -262,6 +262,7 @@ end
 %% Defining the sensitivity functions
 Z_E = zeros(length(f),1);
 V_IL = zeros(length(f),1);
+inductance_cable = 0;
 
 for g = 1:length(f)
 row1 = 2*g-1;
@@ -273,8 +274,8 @@ C = Final_trans_mat1(2,1);
 D = Final_trans_mat1(2,2);
 
 Z_FP = Z_0_FeC;
-Z_E(g) = (A*Z_FP + B)/(C*Z_FP + D) * 2;            % electrical input impedance
-V_IL(g) = Z_FP/(A*Z_FP + B);                   % voltage transfer ratio between input voltage and output force
+Z_E(g) = (A*Z_FP + B)/(C*Z_FP + D) + j*omg(g)*inductance_cable;            % electrical input impedance
+V_IL(g) = Z_FP/(A*Z_FP + B);                                % voltage transfer ratio between input voltage and output force
 end
 
 admittance = 1./Z_E;
@@ -403,7 +404,7 @@ semilogy(f,mag_conductance); hold on; semilogy(freq_vec,mag_conductance2); title
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
 figure
-semilogy(f,mag_resistance); hold on; semilogy(freq_vec,mag_resistance2); title('magnitude plot of the conductance'); ...
+semilogy(f,mag_resistance); hold on; semilogy(freq_vec,mag_resistance2); title('magnitude plot of the resistance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
  

@@ -69,10 +69,10 @@ rho_glue = 960;
 c_glue = 1220;    % unsure about this!!
 l_glue = 0.06*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
-A_glue = pi*r_Cu^2;
-Z_0_glue = rho_Cu * c_Cu * A_Cu;
-f_0_glue = c_Cu/(2*l_Cu);
-gamma_glue = pi*f/f_0_Cu;
+A_glue = pi*r_glue^2;
+Z_0_glue = rho_glue * c_glue * A_glue;
+f_0_glue = c_Cu/(2*l_glue);
+gamma_glue = pi*f/f_0_glue;
 
 glue_mat = [cos(gamma_glue) j*Z_0_glue*sin(gamma_glue); ...
                (j*sin(gamma_glue))/Z_0_glue cos(gamma_glue)];
@@ -119,10 +119,10 @@ rho_house = rho_FeC;
 c_house = c_FeC;    
 l_house = 3.25*10^-3;    
 r_house = 3.5*10^-3;
-A_house = pi*r_Cu^2;
-Z_0_house = rho_Cu * c_Cu * A_Cu;
-f_0_house = c_Cu/(2*l_Cu);
-gamma_house = pi*f/f_0_Cu;
+A_house = pi*r_house^2;
+Z_0_house = rho_house * c_house * A_house;
+f_0_house = c_house/(2*l_house);
+gamma_house = pi*f/f_0_house;
 
 house_mat = [cos(gamma_house) j*Z_0_house*sin(gamma_house); ...
                (j*sin(gamma_house))/Z_0_house cos(gamma_house)];
@@ -199,8 +199,10 @@ B = Final_trans_mat(1,2);
 C = Final_trans_mat(2,1);
 D = Final_trans_mat(2,2);
 
+inductance_cable = 4.3*10^-6;
+
 Z_FP = Z_0_FeC;
-Z_E = (A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
+Z_E = (A*Z_FP + B)/(C*Z_FP + D) + j*omg*inductance_cable;            % electrical input impedance
 V_IL = Z_FP/(A*Z_FP + B);                   % voltage transfer ratio between input voltage and output force
 
 
