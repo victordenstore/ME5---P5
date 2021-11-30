@@ -8,7 +8,7 @@ clc;
 %% Parameter initialization
 
 j = 1i;                                                                     % imaginary value
-f = 4.30*10^5;                                                               % operating frequency [Hz]
+f = 1e+06;                                                               % operating frequency [Hz]
 omega = 2*pi*f;                                                             % operating frequency [rad/s] 
 c_33 = 16.6*10^10;                                                          % Elastic compliance coefficient
 c_n = c_33;                                                                 % Comes from the multilayer paper.
@@ -86,7 +86,7 @@ A_copper = pi*r_copper^2;
 rho_copper = 8920;
 c_copper = 3570;
 d_copper = 0.5*10^-3;
-v_copper = sqrt(c_copper/rho_copper)
+v_copper = c_copper
 
 Z_copper = A_copper*rho_copper*c_copper;
 f_0_cu = v_copper/(2*d_copper)
@@ -109,7 +109,7 @@ r_FP = 4.5*10^-3;
 c_FP = 3230;
 S_FP = pi*r_FP^2;
 d_FP = 0.5*10^-3;
-v_FP = sqrt(c_FP/rho_FP);
+v_FP = c_FP;
 
 Z_FP = rho_FP*c_FP*S_FP;
 f_0_FP = v_FP/(2*d_FP);
@@ -127,7 +127,7 @@ T_intermediate_FP = [A_FP(1,1) A_FP(1,2) 0 0; ...
                     0 0 A_E_FP B_E_FP;
                     0 0 C_E_FP D_E_FP];
 
-T=(Tn)^2 * T_intermediate_copper^2 * T_intermediate_FP;
+T= (Tn)^2*T_intermediate_copper^2 * T_intermediate_FP;
 T_11=Tn(1,1);
 T_12=Tn(1,2);
 T_13=Tn(1,3);
@@ -187,8 +187,9 @@ r_H = 2.5*10^-3;
 c_H = 3230;
 S_H = pi*r_H^2;
 d_H = 3.25*10^-3;
-v_H = sqrt(c_H/rho_H);
-gamma_H = pi*f*d_H;
+v_H = c_H;
+f_o_H = v_H/(2*d_H);
+gamma_H = pi*f/f_o_H;
 Z_H = rho_H*c_H*S_H;
 A_H = [cos(gamma_H) j*Z_H*sin(gamma_H); ...
     (j*sin(gamma_H))/Z_H cos(gamma_H)];
@@ -198,8 +199,9 @@ r_B = 2.5*10^-3;
 c_B = 3230;
 S_B = pi*r_B^2;
 d_B = 20*10^-3;
-v_B = sqrt(c_H/rho_H);
-gamma_B = pi*f*d_B;
+v_B = c_H;
+f_o_B = v_B/(2*d_B);
+gamma_B = pi*f/f_o_B;
 Z_B = rho_H*c_H*S_H;
 A_B = [cos(gamma_B) j*Z_H*sin(gamma_B); ...
     (j*sin(gamma_B))/Z_B cos(gamma_B)];
