@@ -19,7 +19,7 @@ clear all; close all; clc;
 
 %% Parameter initialization
 
-f = linspace(1,2*10^6,10000);      
+f = linspace(1,2*10^6,1000);      
 omg = 2*pi*f;
 j = 1i;
 %% Setting up the backing material matrix
@@ -76,7 +76,7 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-l_glue = 0.06*10^-6;    % to be varied.
+l_glue = 100*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
@@ -256,13 +256,13 @@ for yy = 1:length(f)
 row1 = 2*yy-1;
 row2 = 2*yy;
 
-Final_trans_mat(row1:row2,1:2) = pz_mat(row1:row2,1:2) * Trans_mat(row1:row2,1:2);
+Final_trans_mat(row1:row2,1:2) = pz_mat(row1:row2,1:2)*Trans_mat(row1:row2,1:2);
 end
 
 %% Defining the sensitivity functions
 Z_E = zeros(length(f),1);
 V_IL = zeros(length(f),1);
-inductance_cable = 0;
+inductance_cable = 4.3*10^-6;
 
 for g = 1:length(f)
 row1 = 2*g-1;
@@ -274,18 +274,21 @@ C = Final_trans_mat1(2,1);
 D = Final_trans_mat1(2,2);
 
 Z_FP = Z_0_FeC;
-Z_E(g) = (A*Z_FP + B)/(C*Z_FP + D) + j*omg(g)*inductance_cable;            % electrical input impedance
+Z_E(g) = -(A*Z_FP + B)/(C*Z_FP + D)+j.*omg(g)*inductance_cable;            % electrical input impedance
 V_IL(g) = Z_FP/(A*Z_FP + B);                                % voltage transfer ratio between input voltage and output force
 end
 
 admittance = 1./Z_E;
 susceptance = imag(admittance);
 conductance = real(admittance);
-phase_admittance = rad2deg(angle(admittance));
+phase_admittance = -rad2deg(angle(admittance));
 mag_admittance = 20*log10(abs(admittance));
 mag_conductance = 20*log10(abs(conductance));
 
-phase_impedance = rad2deg(angle(Z_E));
+phase_impedance = -rad2deg(angle(Z_E));
+% high_phase = find(phase_impedance(phase_impedance(1:400)<=-90));
+% phase_impedance(high_phase) = -180-phase_impedance(high_phase);
+% phase_impedance = rad2deg(asin(imag(Z_E)/abs(Z_E)));
 phase_tf = rad2deg(angle(V_IL));
 phase_resistance = rad2deg(angle(real(Z_E)));
 mag_impedance = 20*log10(abs(Z_E));
@@ -359,6 +362,8 @@ current_phasor = current_phasor_amp.*exp(j*current_angle);
 impedance_phasor = (ptp_voltage_vec./2)./current_phasor;
 
 phase_impedance2 = rad2deg(angle(impedance_phasor));
+% high_phase = find(phase_impedance2(phase_impedance2>=90));
+% phase_impedance2(high_phase) = 180-phase_impedance2(high_phase);
 phase_resistance2 = rad2deg(angle(real(impedance_phasor)));
 mag_impedance2 = 20*log10(abs(impedance_phasor));
 mag_resistance2 = 20*log10(abs(real(impedance_phasor)));
@@ -373,27 +378,32 @@ mag_conductance2 = 20*log10(abs(conductance2));
 
 %[pks1 ind1] = findpeaks(mag_impedance,'MinPeakDistance',5000,'MinPeakProminence',0.01);
 %plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
+
+
 figure
-subplot(2,1,1);plot(f,mag_impedance,'g'); hold on; plot(freq_vec,mag_impedance2,'r'); title('Bode magnitude plot of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); ylim([40 90])
+subplot(2,1,1); plot(f,mag_impedance,'b'); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance');
 conversion_vec = 180*ones(length(freq_vec),1);
-subplot(2,1,2); plot(f,phase_impedance,'g'); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r'); title('Phase plot of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('phase [degree]'); ylim([-100 30])
+subplot(2,1,2); plot(f,phase_impedance,'b'); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');  ...
+    xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase'); ylim([-180 180]);
 
 
 % [pks ind] = findpeaks(mag_tf,'MinPeakDistance',5000,'MinPeakProminence',0.01);
 
 figure
-subplot(2,1,1);  plot(f,mag_tf); title('Bode magnitude plot of the transfer function V_{in} --> F_{out}'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
-subplot(2,1,2); plot(f,phase_tf); title('Phase plot of the transfer function V_{in} --> F_{out}'); ...
-    xlabel('frequency [Hz]'); ylabel('phase [degree]');
+subplot(2,1,1);  plot(f./1e6,mag_tf,'b'); title('Frequency response of S_{FV}'); ...
+    xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
+subplot(2,1,2); plot(f./1e6,phase_tf,'b');  ...
+    xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); ylim([-300 300])
+
+% hold on; plot(freq_vec,mag_admittance2,'r');
+% hold on; plot(freq_vec,-phase_admittance2,'r');
 
 figure
-subplot(2,1,1); plot(f,mag_admittance','g'); hold on; plot(freq_vec,mag_admittance2,'r'); title('Bode magnitude plot of the admittance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
-subplot(2,1,2); plot(f,phase_admittance,'g'); hold on; plot(freq_vec,-phase_admittance2,'r'); title('Phase plot of the admittance'); ...
-    xlabel('frequency [Hz]'); ylabel('phase [degree]');
+subplot(2,1,1); plot(f./1e6,mag_admittance','b'); title('Bode magnitude plot of the admittance'); ...
+    xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
+subplot(2,1,2); plot(f./1e6,phase_admittance,'b'); title('Theoretical system admittance phase'); ...
+    xlabel('frequency [MHz]'); ylabel('phase [degree]'); ylim([-150 150])
 
 figure
 plot(f,susceptance,'g'); hold on; plot(freq_vec,susceptance2,'r'); title('Bode magnitude plot of the susceptance'); ...
