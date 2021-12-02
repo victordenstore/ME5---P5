@@ -5,7 +5,7 @@ clc;
 x=0.0000042;
 
 %% intialization
-f = linspace(1,1.5*10^6,1000);
+f = linspace(1,2*10^6,1000);
 w=2*pi*f; % System frequency in rad/s, w=linspace(2.3064*pi*f,2.3068*pi*f,10000); 
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 S=pi*a^2;                        % Piezoelectric surface area
@@ -108,20 +108,22 @@ phase1 = rad2deg(angle(Z_Ae_in));
 plot(f/(1e6),phase1,'b');xlabel('Frequency [MHz]'); ylabel('Phase [deg]'); legend('theoretical system impedance phase');
 grid on; ylim([70 100])
 
-% admittance = 1./Z_Ae_in;
-% phase_ad1 = rad2deg(angle(admittance));
-% mag_ad = 20*log10(abs(admittance));
-% 
-% figure
-% tiledlayout(2,1);
-% nexttile
-% mag_ad =  20*log10(abs(admittance))
-% plot(w/(2*pi*10^-6),mag_ad,'g');title('Bode magnitude plot of the admittance'); ...
-%     xlabel('Frequency [MHz]'); ylabel('magnitude [DB]');
-% ylim([-100 -50])
-% nexttile
-% plot(w/(2*pi*10^6),phase_ad1);xlabel('Frequency [MHz]'); ylabel('Phase [deg]')
-% 
+admittance = 1./Z_Ae_in;
+phase_ad1 = rad2deg(angle(admittance));
+mag_ad = 20*log10(abs(admittance));
+
+
+figure
+tiledlayout(2,1);
+nexttile
+mag_ad =  20*log10(abs(admittance))
+
+ plot(w/(2*pi*10^6),mag_ad,'b');title('Frequency response of the admittance'); ...
+    xlabel('Frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
+ylim([-100 -70])
+nexttile
+ plot(w/(2*pi*10^6),-phase_ad1,'b');xlabel('Frequency [MHz]'); ylabel('Phase [deg]'); legend('Theoretical system admittance phase');
+ylim([70 95]);
 % 
 % M = readmatrix('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\FreqSweepSkabelon.xlsx')
 % 

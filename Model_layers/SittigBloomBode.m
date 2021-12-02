@@ -376,8 +376,8 @@ susceptance2 = imag(admittance2);
 conductance2 = real(admittance2);
 mag_conductance2 = 20*log10(abs(conductance2));
 
-%[pks1 ind1] = findpeaks(mag_impedance,'MinPeakDistance',5000,'MinPeakProminence',0.01);
-%plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
+% [pks1 ind1] = findpeaks(mag_impedance,'MinPeakDistance',5000,'MinPeakProminence',0.01);
+% plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
 
 
 figure
@@ -396,13 +396,13 @@ subplot(2,1,1);  plot(f./1e6,mag_tf,'b'); title('Frequency response of S_{FV}');
 subplot(2,1,2); plot(f./1e6,phase_tf,'b');  ...
     xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); ylim([-300 300])
 
-% hold on; plot(freq_vec,mag_admittance2,'r');
-% hold on; plot(freq_vec,-phase_admittance2,'r');
+
 
 figure
-subplot(2,1,1); plot(f./1e6,mag_admittance','b'); title('Bode magnitude plot of the admittance'); ...
+subplot(2,1,1); plot(f./1e6,mag_admittance','b'); hold on; plot(freq_vec,mag_admittance2,'r');title('Bode magnitude plot of the admittance'); ...
     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
-subplot(2,1,2); plot(f./1e6,phase_admittance,'b'); title('Theoretical system admittance phase'); ...
+subplot(2,1,2); plot(f./1e6,phase_admittance,'b');  hold on; plot(freq_vec,-phase_admittance2,'r');
+ title('Theoretical system admittance phase'); ...
     xlabel('frequency [MHz]'); ylabel('phase [degree]'); ylim([-150 150])
 
 figure
