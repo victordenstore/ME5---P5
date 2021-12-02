@@ -76,63 +76,11 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-l_glue = 20*10^-6;    % to be varied.
+l_glue = linspace(10,100,10)*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
-f_0_glue = c_glue/(2*l_glue);
-gamma_glue = pi*f/f_0_glue;
-
-glue_mat = zeros(2*length(f),2);
-
-for han = 1:length(f)
-row1 = 2*han-1;
-row2 = 2*han;
-
-glue_mat(row1:row2,1:2) = [cos(gamma_glue(han)) j*Z_0_glue*sin(gamma_glue(han)); ...
-               (j*sin(gamma_glue(han)))/Z_0_glue cos(gamma_glue(han))];
-end
-          
-% The matrices are multiplied and the total impedance Z_b of the backing
-% layers is obtained.
-Back_mat = zeros(2*length(f),2);
-Z_b = zeros(length(f),1);
-
-for ii = 1:length(f)
-row1 = 2*ii-1;
-row2 = 2*ii;
-    
-Back_mat(row1:row2,1:2) = glue_mat(row1:row2,1:2)*Back_mat_Cu(row1:row2,1:2) ...
-    *glue_mat(row1:row2,1:2)*Back_mat_FeC(row1:row2,1:2);
-Back_mat_current = Back_mat(row1:row2,1:2);
-A_b = Back_mat_current(1,1);
-B_b = Back_mat_current(1,2);
-C_b = Back_mat_current(2,1);
-D_b = Back_mat_current(2,2);
-
-Z_0b = Z_0_FeC;
-Z_b(ii) = (A_b*Z_0b + B_b)/(C_b*Z_0b + D_b);    % Here Z_0b is the impedance of the final backing layer only!
-end
-
-%% Setting up the transmission layer matrix
-
-% The intermediate layers in the transmission direction are obtained in the
-% same way. Again starting with the intermediate layer closest to the
-% piezoelectric active layer.
-
-% The material parameters were already given before!
-Trans_mat_Cu = zeros(length(f),2);
-
-for jj = 1:length(f)
-row1 = 2*jj-1;
-row2 = 2*jj;
-   
-Trans_mat_Cu(row1:row2,1:2) = [cos(gamma_Cu(jj)) j*Z_0_Cu*sin(gamma_Cu(jj)); ...
-               (j*sin(gamma_Cu(jj)))/Z_0_Cu cos(gamma_Cu(jj))];
-end
-
-% For now the glue layer is omitted and the matrix is setup for the front
-% plate only. Which is made out of Steel, just as the backing material.
+f_0_glue = c_glue./(2*l_glue);
 
 % material properties of steel front plate.
 r_FP = 4.5*10^-3;
@@ -141,18 +89,6 @@ Z_0_FP = rho_FeC * c_FeC * A_FP;
 l_FeC = 0.5*10^-3;
 f_0_FP = c_FeC/(2*l_FeC);                    
 gamma_FeC = pi*f/f_0_FP;
-
-Trans_mat_FP = zeros(2*length(f),2);
-
-for x = 1:length(f)
-row1 = 2*x-1;
-row2 = 2*x;
-
-Trans_mat_FP(row1:row2,1:2) = [cos(gamma_FeC(x)) j*Z_0_FP*sin(gamma_FeC(x)); ...
-                (j*sin(gamma_FeC(x)))/Z_0_FP cos(gamma_FeC(x))];
-end
-
-%The housing, simply modelled as a another transmission plate
 
 rho_house = rho_FeC;  
 c_house = c_FeC;    
@@ -163,30 +99,7 @@ Z_0_house = rho_house * c_house * A_house;
 f_0_house = c_house/(2*l_house);
 gamma_house = pi*f/f_0_house;
 
-house_mat = zeros(2*length(f),2);
-
-for kla = 1:length(f)
-    row1 = 2*kla-1;
-    row2 = 2*kla;
-    
-house_mat(row1:row2,1:2) = [cos(gamma_house(kla)) j*Z_0_house*sin(gamma_house(kla)); ...
-               (j*sin(gamma_house(kla)))/Z_0_house cos(gamma_house(kla))];
-end
-% Multiplication of the transmission piezoelectric inactive layers gives:
-Trans_mat = zeros(2*length(f),2);
-
-for xx = 1:length(f)
-row1 = 2*xx-1;
-row2 = 2*xx;
-
-Trans_mat(row1:row2,1:2) = glue_mat(row1:row2,1:2)*Trans_mat_Cu(row1:row2,1:2) ...
-    * glue_mat(row1:row2,1:2)*Trans_mat_FP(row1:row2,1:2)*house_mat(row1:row2,1:2);
-end
-                   
-%% Setting up the matrix describing the active Piezoelectric layer
-
-% The material parameters
-
+% pz para
 rho_pz = 7800;  
 c_pz = 4613;    
 l_pz = 2*10^-3;
@@ -209,7 +122,6 @@ sigma = k^2./theta;
 phi = acos((cos(theta)-sigma.*sin(theta))./(1-sigma.*sin(theta)));
 R = (sqrt(sin(theta)-2*sigma.*(1-cos(theta))))./sin(theta);
 R_inv = 1./R;
-
 T_11 = cos(N*phi);
 T_12 = -j*Z*R.*sin(N*phi);
 T_13 = -h*C_s*tan(0.5*phi).*sin(N*phi);
@@ -226,57 +138,65 @@ T_41 = -j*h*C_s.*Z_inv.*R_inv.*tan(0.5*phi).*(cos(N*phi)-(-1)^N);
 T_42 = -h*C_s*tan(0.5*phi).*sin(N*phi);
 T_43 = j*((N*(-1)^N)*(1+2*sigma.*R_inv.*tan(0.5*phi))+sigma.*R_inv.*((tan(0.5*phi)).^2).*sin(N*phi)).*omg*C_s;
 T_44 = (-1)^N;
-
-z_b = Z_b/Z_0_pz;
-
-A_c = zeros(length(f),1);
-B_c = zeros(length(f),1);
-C_c = zeros(length(f),1);
-D_c = zeros(length(f),1);
-pz_mat = zeros(2*length(f),2);
-
-for y = 1:length(f)
-row1 = 2*y-1;
-row2 = 2*y;
-
-A_c(y) = T_31 - T_33*(T_21(y)*z_b(y) + T_11(y))/(T_23(y)*z_b(y) + T_13(y));
-B_c(y) = T_32 - T_33*(T_22(y)*z_b(y) + T_12(y))/(T_23(y)*z_b(y) + T_13(y));
-C_c(y) = T_41(y) - T_43(y)*(T_21(y)*z_b(y) + T_11(y))/(T_23(y)*z_b(y) + T_13(y));
-D_c(y) = T_42(y) - T_43(y)*(T_22(y)*z_b(y) + T_12(y))/(T_23(y)*z_b(y) + T_13(y));
-pz_mat(row1:row2,1:2) = [A_c(y) B_c(y); C_c(y) D_c(y)];
-end
-%% Setting up the final transducer representing matrix
-
-% Here the piezoelectric matric is multiplied by the matrix obtained from
-% the transmission intermediate layers:
-
-Final_trans_mat = zeros(2*length(f),2);
-
-for yy = 1:length(f)
-row1 = 2*yy-1;
-row2 = 2*yy;
-
-Final_trans_mat(row1:row2,1:2) = pz_mat(row1:row2,1:2)*Trans_mat(row1:row2,1:2);
-end
-
-%% Defining the sensitivity functions
-Z_E = zeros(length(f),1);
-V_IL = zeros(length(f),1);
 inductance_cable = 4.3*10^-6;
 
-for g = 1:length(f)
-row1 = 2*g-1;
-row2 = 2*g;
-Final_trans_mat1 = Final_trans_mat(row1:row2,1:2);
+glue_mat = zeros(2*length(f),2*length(l_glue));
+Back_mat = zeros(2*length(f),2*length(l_glue));
+Z_b = zeros(length(f),length(l_glue));
+Trans_mat = zeros(2*length(f),2*length(l_glue));
+Final_trans_mat = zeros(2*length(f),2*length(l_glue));
+Z_E = zeros(length(f),length(l_glue));
+V_IL = zeros(length(f),length(l_glue));
+
+for er = 1:length(l_glue)
+col1 = 2*er-1;
+col2 = 2*er;
+gamma_glue = pi*f/f_0_glue(er);
+for han = 1:length(f)
+row1 = 2*han-1;
+row2 = 2*han;
+    glue_mat(row1:row2,col1:col2) = [cos(gamma_glue(han)) j*Z_0_glue*sin(gamma_glue(han)); ...
+               (j*sin(gamma_glue(han)))/Z_0_glue cos(gamma_glue(han))];
+           
+% The matrices are multiplied and the total impedance Z_b of the backing
+% layers is obtained.
+Back_mat(row1:row2,col1:col2) = glue_mat(row1:row2,col1:col2)*Back_mat_Cu(row1:row2,1:2) ...
+    *glue_mat(row1:row2,col1:col2)*Back_mat_FeC(row1:row2,1:2);
+Back_mat_current = Back_mat(row1:row2,col1:col2);
+A_b = Back_mat_current(1,1);
+B_b = Back_mat_current(1,2);
+C_b = Back_mat_current(2,1);
+D_b = Back_mat_current(2,2);
+
+Z_0b = Z_0_FeC;
+Z_b(han,er) = (A_b*Z_0b + B_b)/(C_b*Z_0b + D_b);    % Here Z_0b is the impedance of the final backing layer only!
+
+Trans_mat_Cu = Back_mat_Cu(row1:row2,1:2);
+Trans_mat_FP = [cos(gamma_FeC(han)) j*Z_0_FP*sin(gamma_FeC(han)); ...
+                (j*sin(gamma_FeC(han)))/Z_0_FP cos(gamma_FeC(han))];
+house_mat = [cos(gamma_house(han)) j*Z_0_house*sin(gamma_house(han)); ...
+               (j*sin(gamma_house(han)))/Z_0_house cos(gamma_house(han))];
+Trans_mat(row1:row2,col1:col2) = glue_mat(row1:row2,col1:col2)*Trans_mat_Cu ...
+    * glue_mat(row1:row2,col1:col2)*Trans_mat_FP*house_mat;
+z_b = Z_b(han,er)/Z_0_pz;
+
+A_c = T_31 - T_33*(T_21(han)*z_b + T_11(han))/(T_23(han)*z_b + T_13(han));
+B_c = T_32 - T_33*(T_22(han)*z_b + T_12(han))/(T_23(han)*z_b + T_13(han));
+C_c = T_41(han) - T_43(han)*(T_21(han)*z_b + T_11(han))/(T_23(han)*z_b + T_13(han));
+D_c = T_42(han) - T_43(han)*(T_22(han)*z_b + T_12(han))/(T_23(han)*z_b + T_13(han));
+pz_mat = [A_c B_c; C_c D_c];
+
+Final_trans_mat(row1:row2,col1:col2) = pz_mat*Trans_mat(row1:row2,col1:col2);
+Final_trans_mat1 = Final_trans_mat(row1:row2,col1:col2);
 A = Final_trans_mat1(1,1);
 B = Final_trans_mat1(1,2);
 C = Final_trans_mat1(2,1);
 D = Final_trans_mat1(2,2);
-
 Z_FP = Z_0_FeC;
-Z_E(g) = -(A*Z_FP + B)/(C*Z_FP + D)+j.*omg(g)*inductance_cable;            % electrical input impedance
-V_IL(g) = Z_FP/(A*Z_FP + B);                                % voltage transfer ratio between input voltage and output force
+Z_E(han,er) = -(A*Z_FP + B)/(C*Z_FP + D)+j.*omg(han)*inductance_cable;            % electrical input impedance
+V_IL(han,er) = Z_FP/(A*Z_FP + B);            
 end
+end         
 
 admittance = 1./Z_E;
 susceptance = imag(admittance);
@@ -284,30 +204,27 @@ conductance = real(admittance);
 phase_admittance = -rad2deg(angle(admittance));
 mag_admittance = 20*log10(abs(admittance));
 mag_conductance = 20*log10(abs(conductance));
-
 phase_impedance = -rad2deg(angle(Z_E));
-% high_phase = find(phase_impedance(phase_impedance(1:400)<=-90));
-% phase_impedance(high_phase) = -180-phase_impedance(high_phase);
-% phase_impedance = rad2deg(asin(imag(Z_E)/abs(Z_E)));
 
-first_quadrant = find(real(V_IL)>0 & imag(V_IL)>0);
-second_quadrant = find(real(V_IL)<0 & imag(V_IL)>0);
-third_quadrant = find(real(V_IL)<0 & imag(V_IL)<0);
-fourth_quadrant = find(real(V_IL)>0 & imag(V_IL)<0);
-quadrant_order = [first_quadrant; second_quadrant; third_quadrant; fourth_quadrant];
 
-phase1 = rad2deg(angle(V_IL(first_quadrant)));
-phase2 = rad2deg(angle(V_IL(second_quadrant)));
-phase3 = 360 + rad2deg(angle(V_IL(third_quadrant)));
-phase4 = 360 + rad2deg(angle(V_IL(fourth_quadrant)));
-phasers = [phase1; phase2; phase3; phase4];
 
-sync_vec = [quadrant_order phasers];
-[a_sorted, a_order] = sort(sync_vec(:,1));
-B = sync_vec(:,2);
-newB = B(a_order,:);
-sortedvector = [a_sorted newB];
-phase_tf = sortedvector(:,2);
+% first_quadrant = find(real(V_IL)>0 & imag(V_IL)>0);
+% second_quadrant = find(real(V_IL)<0 & imag(V_IL)>0);
+% third_quadrant = find(real(V_IL)<0 & imag(V_IL)<0);
+% fourth_quadrant = find(real(V_IL)>0 & imag(V_IL)<0);
+% quadrant_order = [first_quadrant; second_quadrant; third_quadrant; fourth_quadrant];
+% phase1 = rad2deg(angle(V_IL(first_quadrant)));
+% phase2 = rad2deg(angle(V_IL(second_quadrant)));
+% phase3 = 360 + rad2deg(angle(V_IL(third_quadrant)));
+% phase4 = 360 + rad2deg(angle(V_IL(fourth_quadrant)));
+% phasers = [phase1; phase2; phase3; phase4];
+% sync_vec = [quadrant_order phasers];
+% [a_sorted, a_order] = sort(sync_vec(:,1));
+% B = sync_vec(:,2);
+% newB = B(a_order,:);
+% sortedvector = [a_sorted newB];
+
+phase_tf = rad2deg(phase(V_IL(:)));
 phase_resistance = rad2deg(angle(real(Z_E)));
 mag_impedance = 20*log10(abs(Z_E));
 mag_tf = 20*log10(abs(V_IL));
@@ -396,43 +313,61 @@ mag_conductance2 = 20*log10(abs(conductance2));
 
 % [pks1 ind1] = findpeaks(mag_impedance,'MinPeakDistance',5000,'MinPeakProminence',0.01);
 % plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
+figure(1)
+hold on
+figure(2)
+hold on
+figure(3)
+hold on
+figure(4)
+hold on
+figure(5)
+hold on
+figure(6)
+hold on
 
+for uu = 1:length(l_glue)
+row_begin = length(f)*uu-(length(f)-1);
+row_end = length(f)*uu;
 
-figure
-subplot(2,1,1); plot(f,mag_impedance,'b'); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance');
+figure(1);
+subplot(2,1,1); plot(f,mag_impedance(:,uu)); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
+xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance'); 
 conversion_vec = 180*ones(length(freq_vec),1);
-subplot(2,1,2); plot(f,phase_impedance,'b'); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');  ...
-    xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase'); ylim([-180 180]);
+subplot(2,1,2); plot(f,phase_impedance(:,uu)); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');  ...
+xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase'); ylim([-180 180]);
 
-
-% [pks ind] = findpeaks(mag_tf,'MinPeakDistance',5000,'MinPeakProminence',0.01);
-
-figure
-subplot(2,1,1);  plot(f./1e6,mag_tf,'b'); title('Frequency response of S_{FV}'); ...
+figure(2);
+subplot(2,1,1);  plot(f./1e6,mag_tf(:,uu)); hold on; title('Frequency response of S_{FV}'); ...
     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
-subplot(2,1,2); plot(f./1e6,phase_tf,'b');  ...
+subplot(2,1,2); plot(f./1e6,phase_tf(row_begin:row_end)); hold on; ...
     xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); 
 
-
-
-figure
-subplot(2,1,1); plot(f./1e6,mag_admittance','b'); hold on; plot(freq_vec./1e6,mag_admittance2,'r');title('Bode magnitude plot of the admittance'); ...
+figure(3);
+subplot(2,1,1); plot(f./1e6,mag_admittance(:,uu)); hold on; plot(freq_vec./1e6,mag_admittance2,'r');title('Bode magnitude plot of the admittance'); ...
     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
-subplot(2,1,2); plot(f./1e6,phase_admittance,'b');  hold on; plot(freq_vec./1e6,-phase_admittance2,'r');
+subplot(2,1,2); plot(f./1e6,phase_admittance(:,uu));  hold on; plot(freq_vec./1e6,-phase_admittance2,'r');
  title('Theoretical system admittance phase'); ...
     xlabel('frequency [MHz]'); ylabel('phase [degree]'); ylim([-150 150])
 
-figure
-plot(f,susceptance,'g'); hold on; plot(freq_vec,susceptance2,'r'); title('Bode magnitude plot of the susceptance'); ...
+figure(4)
+plot(f,susceptance(:,uu)); hold on; plot(freq_vec,susceptance2,'r'); title('Bode magnitude plot of the susceptance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
-figure
-semilogy(f,mag_conductance); hold on; semilogy(freq_vec,mag_conductance2); title('magnitude plot of the conductance'); ...
+figure(5)
+semilogy(f,mag_conductance(:,uu)); hold on; semilogy(freq_vec,mag_conductance2); title('magnitude plot of the conductance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
-figure
-semilogy(f,mag_resistance); hold on; semilogy(freq_vec,mag_resistance2); title('magnitude plot of the resistance'); ...
+figure(6)
+semilogy(f,mag_resistance(:,uu)); hold on; semilogy(freq_vec,mag_resistance2); title('magnitude plot of the resistance'); ...
     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
  
+end
+
+
+
+
+
+
+

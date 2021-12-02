@@ -118,11 +118,14 @@ tiledlayout(2,1);
 nexttile
 mag_ad =  20*log10(abs(admittance))
 
- plot(w/(2*pi*10^6),mag_ad,'b');title('Frequency response of the admittance'); ...
-    xlabel('Frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
-ylim([-100 -70])
+[pks1 ind1] = findpeaks(phase_ad1,'MinPeakDistance',5,'MinPeakProminence',10);
+
+
+plot(w/(2*pi*10^6),mag_ad,'b'); hold on; plot(w(ind1)/(2*pi*10^6),mag_ad(ind1),'or'); title('Frequency response of the admittance'); ...
+ xlabel('Frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
+ylim([-100 -65])
 nexttile
- plot(w/(2*pi*10^6),-phase_ad1,'b');xlabel('Frequency [MHz]'); ylabel('Phase [deg]'); legend('Theoretical system admittance phase');
+plot(w/(2*pi*10^6),-phase_ad1,'b'); hold on; plot(w(ind1)/(2*pi*10^6),-phase_ad1(ind1),'or'); xlabel('Frequency [MHz]'); ylabel('Phase [deg]'); legend('Theoretical system admittance phase');
 ylim([70 95]);
 % 
 % M = readmatrix('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\FreqSweepSkabelon.xlsx')
