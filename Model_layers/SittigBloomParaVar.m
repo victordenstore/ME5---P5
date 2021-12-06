@@ -35,6 +35,7 @@ clear all; close all; clc;
 f = linspace(1,2*10^6,1000);      
 omg = 2*pi*f;
 j = 1i;
+par_steps = 5;
 %% Setting up the backing material matrix
 
 % First the layer closest to the piezoelectric layer, hence the copper
@@ -47,8 +48,8 @@ c_Cu = 3570;    % pure copper speed of sound.
 
 % depending on the type of parameter variation, one of the following
 % options for l_Cu should be chosen.
-l_Cu = ones(10,1)*0.5e-3;   % choose this if the effect of one other parameter variation is to be obtained.                       
-% l_Cu = linspace(0.4,0.6,10)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
+l_Cu = ones(par_steps,1)*0.5e-3;   % choose this if the effect of one other parameter variation is to be obtained.                       
+% l_Cu = linspace(0.4,0.6,par_steps)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
 % l_Cu = l_Cu(:);
 r_Cu = 2.5*10^-3;
 A_Cu = pi*r_Cu^2;
@@ -98,9 +99,9 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-l_glue = ones(10,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
-% l_glue = linspace(10,100,10)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
-% l_glue = l_glue(:);
+% l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
+l_glue = linspace(10,150,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
+l_glue = l_glue(:);
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
@@ -116,8 +117,8 @@ gamma_FeC = pi*f/f_0_FP;
 
 rho_house = rho_FeC;  
 c_house = c_FeC;    
-l_house = ones(10,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
-% l_house = linspace(0.5,1.5,10)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
+l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
+% l_house = linspace(0.5,1.5,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
 % l_house = l_house(:);
 r_house = 3.5*10^-3;
 A_house = pi*r_house^2;
@@ -128,8 +129,8 @@ gamma_house = pi*f./f_0_house;
 % pz para
 rho_pz = 7800;  
 c_pz = 4613;    
-l_pz = ones(10,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
-% l_pz = linspace(0.5,1.5,10)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
+l_pz = ones(par_steps,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
+% l_pz = linspace(0.5,1.5,par_steps)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
 % l_pz = l_pz(:);
 r_pz = 2.5*10^-3;
 A_pz = pi*r_pz^2;
@@ -356,13 +357,15 @@ hold on
 figure(6)
 hold on
 
+handle = zeros(par_steps,1);
+
 for uu = 1:length(l_glue)
 % row_begin = length(f)*uu-(length(f)-1);
-% row_end = length(f)*uu;
+% row_end = length(f)*uu; legend('Theoretical system impedance');
 
 figure(1);
-subplot(2,1,1); plot(f,mag_impedance(:,uu)); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
-xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance'); 
+subplot(2,1,1); handle(uu)=plot(f,mag_impedance(:,uu),'DisplayName', ['Glue Thickness', num2str(l_glue(uu)*10^6),'\mu','m']); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
+xlabel('frequency [Hz]'); ylabel('magnitude [DB]');  
 conversion_vec = 180*ones(length(freq_vec),1);
 subplot(2,1,2); plot(f,phase_impedance(:,uu)); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');  ...
 xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase'); ylim([-180 180]);
@@ -396,6 +399,7 @@ semilogy(f,mag_resistance(:,uu)); hold on; semilogy(freq_vec,mag_resistance2); t
 end
 
 
+legend([handle(1) handle(2) handle(3) handle(4) handle(5)])
 
 
 
