@@ -1,4 +1,4 @@
-% This script is an intent to accurately model a piezoelectric transuducer,
+% This script is an intent to accurately model a piezoelectric transducer,
 % consisting of multiple intermediate piezoelectric inactive layers. The
 % modelling is done following the approach as described by Sittig in his
 % paper: 'Effects of Bonding and Electrode Layers on the  Transmission     
@@ -13,6 +13,19 @@
 % upon the model by inclusion of a second piezoelectric active layer in
 % parallel with the first layer and by taking glue layers into
 % consideration.
+
+% Be careful when changing the material parameters!! For now some
+% parameters can be changed, however, the order is very important! Per
+% changeable parameter, there are 10 different possibilities, resulting in
+% 10*1000 = 10000 loops. In the first loop the frequency response for ONE
+% value of the parameter is used. This counts for every variable material
+% parameter! Therefore, if e.g. both l_glue and l_Cu are changed to be of
+% the form linspace(x,y,10), this would mean that for 1000 loops the first
+% entries of both vectors are utilized and then consistantly the next
+% entries are used for the coming 1000 loops. Hence, if one would like to
+% see the effect of a change in one parameter only, the values of all the
+% other parameters have to be set to one value, in the form:
+% ones(10,1)*specific_value.
 
 %% close all former work
 clear all; close all; clc;
@@ -31,21 +44,30 @@ j = 1i;
 
 rho_Cu = 8960;  % Pure! copper density.
 c_Cu = 3570;    % pure copper speed of sound.
-l_Cu = 0.5*10^-3;
+
+% depending on the type of parameter variation, one of the following
+% options for l_Cu should be chosen.
+l_Cu = ones(10,1)*0.5e-3;   % choose this if the effect of one other parameter variation is to be obtained.                       
+% l_Cu = linspace(0.4,0.6,10)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
+% l_Cu = l_Cu(:);
 r_Cu = 2.5*10^-3;
 A_Cu = pi*r_Cu^2;
 Z_0_Cu = rho_Cu * c_Cu * A_Cu;
-f_0_Cu = c_Cu/(2*l_Cu);
-gamma_Cu = pi*f/f_0_Cu;
+f_0_Cu = c_Cu./(2*l_Cu);
+gamma_Cu = pi*f./f_0_Cu;
 
 % The matrix
-Back_mat_Cu = zeros(2*length(f),2);
+Back_mat_Cu = zeros(2*length(f),2*length(l_Cu));
 
+for ta = 1:length(l_Cu)
+    col1_Cu = 2*ta-1;
+    col2_Cu = 2*ta;
 for i = 1:length(f)
 row1 = 2*i-1;
 row2 = 2*i;
-Back_mat_Cu(row1:row2,1:2) = [cos(gamma_Cu(i)) j*Z_0_Cu*sin(gamma_Cu(i)); ...
-               (j*sin(gamma_Cu(i)))/Z_0_Cu cos(gamma_Cu(i))];
+Back_mat_Cu(row1:row2,col1_Cu:col2_Cu) = [cos(gamma_Cu(ta,i)) j*Z_0_Cu*sin(gamma_Cu(ta,i)); ...
+               (j*sin(gamma_Cu(ta,i)))/Z_0_Cu cos(gamma_Cu(ta,i))];
+end
 end
           
            
@@ -76,7 +98,9 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-l_glue = linspace(10,100,10)*10^-6;    % to be varied.
+l_glue = ones(10,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
+% l_glue = linspace(10,100,10)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
+% l_glue = l_glue(:);
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
@@ -92,31 +116,35 @@ gamma_FeC = pi*f/f_0_FP;
 
 rho_house = rho_FeC;  
 c_house = c_FeC;    
-l_house = 3.25*10^-3;    
+l_house = ones(10,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
+% l_house = linspace(0.5,1.5,10)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
+% l_house = l_house(:);
 r_house = 3.5*10^-3;
 A_house = pi*r_house^2;
 Z_0_house = rho_house * c_house * A_house;
-f_0_house = c_house/(2*l_house);
-gamma_house = pi*f/f_0_house;
+f_0_house = c_house./(2*l_house);
+gamma_house = pi*f./f_0_house;
 
 % pz para
 rho_pz = 7800;  
 c_pz = 4613;    
-l_pz = 2*10^-3;
+l_pz = ones(10,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
+% l_pz = linspace(0.5,1.5,10)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
+% l_pz = l_pz(:);
 r_pz = 2.5*10^-3;
 A_pz = pi*r_pz^2;
 Z_0_pz = rho_pz * c_pz * A_pz;
 N = 2;
 eps_0=8.854*10^-12;          
 eps_33=1200*eps_0;
-C_s = A_pz*eps_33/l_pz;
+C_s = A_pz*eps_33./l_pz;
 s_33 = 14.2*10^-12;
 d_33 = 265*10^-12;
 h_33 = d_33/(s_33*eps_33);
 h = h_33;
 Z = A_pz*rho_pz*c_pz;
 Z_inv = 1/Z;
-theta = omg*l_pz/c_pz;
+theta = omg.*l_pz./c_pz;
 k = 0.46;
 sigma = k^2./theta;
 phi = acos((cos(theta)-sigma.*sin(theta))./(1-sigma.*sin(theta)));
@@ -124,7 +152,7 @@ R = (sqrt(sin(theta)-2*sigma.*(1-cos(theta))))./sin(theta);
 R_inv = 1./R;
 T_11 = cos(N*phi);
 T_12 = -j*Z*R.*sin(N*phi);
-T_13 = -h*C_s*tan(0.5*phi).*sin(N*phi);
+T_13 = -h*C_s.*tan(0.5*phi).*sin(N*phi);
 T_14 = 0;
 T_21 = -j*Z_inv.*R_inv.*sin(N*phi);
 T_22 = cos(N*phi);
@@ -135,8 +163,8 @@ T_32 = 0;
 T_33 = (-1)^N;
 T_34 = 0;
 T_41 = -j*h*C_s.*Z_inv.*R_inv.*tan(0.5*phi).*(cos(N*phi)-(-1)^N);
-T_42 = -h*C_s*tan(0.5*phi).*sin(N*phi);
-T_43 = j*((N*(-1)^N)*(1+2*sigma.*R_inv.*tan(0.5*phi))+sigma.*R_inv.*((tan(0.5*phi)).^2).*sin(N*phi)).*omg*C_s;
+T_42 = -h*C_s.*tan(0.5*phi).*sin(N*phi);
+T_43 = j*((N*(-1)^N)*(1+2*sigma.*R_inv.*tan(0.5*phi))+sigma.*R_inv.*((tan(0.5*phi)).^2).*sin(N*phi)).*omg.*C_s;
 T_44 = (-1)^N;
 inductance_cable = 4.3*10^-6;
 
@@ -147,6 +175,7 @@ Trans_mat = zeros(2*length(f),2*length(l_glue));
 Final_trans_mat = zeros(2*length(f),2*length(l_glue));
 Z_E = zeros(length(f),length(l_glue));
 V_IL = zeros(length(f),length(l_glue));
+phase_tf = zeros(length(f),length(l_glue));
 
 for er = 1:length(l_glue)
 col1 = 2*er-1;
@@ -160,7 +189,7 @@ row2 = 2*han;
            
 % The matrices are multiplied and the total impedance Z_b of the backing
 % layers is obtained.
-Back_mat(row1:row2,col1:col2) = glue_mat(row1:row2,col1:col2)*Back_mat_Cu(row1:row2,1:2) ...
+Back_mat(row1:row2,col1:col2) = glue_mat(row1:row2,col1:col2)*Back_mat_Cu(row1:row2,col1:col2) ...
     *glue_mat(row1:row2,col1:col2)*Back_mat_FeC(row1:row2,1:2);
 Back_mat_current = Back_mat(row1:row2,col1:col2);
 A_b = Back_mat_current(1,1);
@@ -171,19 +200,19 @@ D_b = Back_mat_current(2,2);
 Z_0b = Z_0_FeC;
 Z_b(han,er) = (A_b*Z_0b + B_b)/(C_b*Z_0b + D_b);    % Here Z_0b is the impedance of the final backing layer only!
 
-Trans_mat_Cu = Back_mat_Cu(row1:row2,1:2);
+Trans_mat_Cu = Back_mat_Cu(row1:row2,col1:col2);
 Trans_mat_FP = [cos(gamma_FeC(han)) j*Z_0_FP*sin(gamma_FeC(han)); ...
                 (j*sin(gamma_FeC(han)))/Z_0_FP cos(gamma_FeC(han))];
-house_mat = [cos(gamma_house(han)) j*Z_0_house*sin(gamma_house(han)); ...
-               (j*sin(gamma_house(han)))/Z_0_house cos(gamma_house(han))];
+house_mat = [cos(gamma_house(er,han)) j*Z_0_house*sin(gamma_house(er,han)); ...
+               (j*sin(gamma_house(er,han)))/Z_0_house cos(gamma_house(er,han))];
 Trans_mat(row1:row2,col1:col2) = glue_mat(row1:row2,col1:col2)*Trans_mat_Cu ...
     * glue_mat(row1:row2,col1:col2)*Trans_mat_FP*house_mat;
 z_b = Z_b(han,er)/Z_0_pz;
 
-A_c = T_31 - T_33*(T_21(han)*z_b + T_11(han))/(T_23(han)*z_b + T_13(han));
-B_c = T_32 - T_33*(T_22(han)*z_b + T_12(han))/(T_23(han)*z_b + T_13(han));
-C_c = T_41(han) - T_43(han)*(T_21(han)*z_b + T_11(han))/(T_23(han)*z_b + T_13(han));
-D_c = T_42(han) - T_43(han)*(T_22(han)*z_b + T_12(han))/(T_23(han)*z_b + T_13(han));
+A_c = T_31 - T_33*(T_21(er,han)*z_b + T_11(er,han))/(T_23(er,han)*z_b + T_13(er,han));
+B_c = T_32 - T_33*(T_22(er,han)*z_b + T_12(er,han))/(T_23(er,han)*z_b + T_13(er,han));
+C_c = T_41(er,han) - T_43(er,han)*(T_21(er,han)*z_b + T_11(er,han))/(T_23(er,han)*z_b + T_13(er,han));
+D_c = T_42(er,han) - T_43(er,han)*(T_22(er,han)*z_b + T_12(er,han))/(T_23(er,han)*z_b + T_13(er,han));
 pz_mat = [A_c B_c; C_c D_c];
 
 Final_trans_mat(row1:row2,col1:col2) = pz_mat*Trans_mat(row1:row2,col1:col2);
@@ -193,8 +222,9 @@ B = Final_trans_mat1(1,2);
 C = Final_trans_mat1(2,1);
 D = Final_trans_mat1(2,2);
 Z_FP = Z_0_FeC;
-Z_E(han,er) = -(A*Z_FP + B)/(C*Z_FP + D)+j.*omg(han)*inductance_cable;            % electrical input impedance
-V_IL(han,er) = Z_FP/(A*Z_FP + B);            
+Z_E(han,er) = -(A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
+V_IL(han,er) = Z_FP/(A*Z_FP + B);   
+phase_tf(han,er) = rad2deg(phase(V_IL(han,er)));
 end
 end         
 
@@ -224,7 +254,7 @@ phase_impedance = -rad2deg(angle(Z_E));
 % newB = B(a_order,:);
 % sortedvector = [a_sorted newB];
 
-phase_tf = rad2deg(phase(V_IL(:)));
+
 phase_resistance = rad2deg(angle(real(Z_E)));
 mag_impedance = 20*log10(abs(Z_E));
 mag_tf = 20*log10(abs(V_IL));
@@ -327,8 +357,8 @@ figure(6)
 hold on
 
 for uu = 1:length(l_glue)
-row_begin = length(f)*uu-(length(f)-1);
-row_end = length(f)*uu;
+% row_begin = length(f)*uu-(length(f)-1);
+% row_end = length(f)*uu;
 
 figure(1);
 subplot(2,1,1); plot(f,mag_impedance(:,uu)); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
@@ -340,7 +370,7 @@ xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system i
 figure(2);
 subplot(2,1,1);  plot(f./1e6,mag_tf(:,uu)); hold on; title('Frequency response of S_{FV}'); ...
     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
-subplot(2,1,2); plot(f./1e6,phase_tf(row_begin:row_end)); hold on; ...
+subplot(2,1,2); plot(f./1e6,phase_tf(:,uu)); hold on; ...
     xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); 
 
 figure(3);

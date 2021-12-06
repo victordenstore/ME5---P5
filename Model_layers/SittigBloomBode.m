@@ -19,7 +19,7 @@ clear all; close all; clc;
 
 %% Parameter initialization
 
-f = linspace(1,2*10^6,1000);      
+f = linspace(1*10^5,1.5*10^6,1000);      
 omg = 2*pi*f;
 j = 1i;
 %% Setting up the backing material matrix
@@ -76,7 +76,7 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-l_glue = 20*10^-6;    % to be varied.
+l_glue = 100*10^-6;    % to be varied.
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
@@ -140,7 +140,7 @@ A_FP = pi*r_FP^2;
 Z_0_FP = rho_FeC * c_FeC * A_FP;
 l_FeC = 0.5*10^-3;
 f_0_FP = c_FeC/(2*l_FeC);                    
-gamma_FeC = pi*f/f_0_FP;
+gamma_FP = pi*f/f_0_FP;
 
 Trans_mat_FP = zeros(2*length(f),2);
 
@@ -148,8 +148,8 @@ for x = 1:length(f)
 row1 = 2*x-1;
 row2 = 2*x;
 
-Trans_mat_FP(row1:row2,1:2) = [cos(gamma_FeC(x)) j*Z_0_FP*sin(gamma_FeC(x)); ...
-                (j*sin(gamma_FeC(x)))/Z_0_FP cos(gamma_FeC(x))];
+Trans_mat_FP(row1:row2,1:2) = [cos(gamma_FP(x)) j*Z_0_FP*sin(gamma_FP(x)); ...
+                (j*sin(gamma_FP(x)))/Z_0_FP cos(gamma_FP(x))];
 end
 
 %The housing, simply modelled as a another transmission plate
@@ -394,24 +394,27 @@ susceptance2 = imag(admittance2);
 conductance2 = real(admittance2);
 mag_conductance2 = 20*log10(abs(conductance2));
 
-% [pks1 ind1] = findpeaks(mag_impedance,'MinPeakDistance',5000,'MinPeakProminence',0.01);
-% plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
+[pk inde] = findpeaks(mag_impedance,'MinPeakDistance',5,'MinPeakProminence',10);
+
+
+[pkss indexx] = findpeaks(mag_tf(1:300),'MinPeakDistance',5,'MinPeakProminence',5);
+ 
 
 
 figure
 subplot(2,1,1); plot(f,mag_impedance,'b'); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance');
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance','Experimental system inpedance'); xline(430000); xline(450000)
 conversion_vec = 180*ones(length(freq_vec),1);
-subplot(2,1,2); plot(f,phase_impedance,'b'); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');  ...
-    xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase'); ylim([-180 180]);
+subplot(2,1,2); plot(f,phase_impedance,'b'); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');   ...
+    xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase','Experimental system impedance phase'); ylim([-180 180]);
 
 
 % [pks ind] = findpeaks(mag_tf,'MinPeakDistance',5000,'MinPeakProminence',0.01);
 
 figure
-subplot(2,1,1);  plot(f./1e6,mag_tf,'b'); title('Frequency response of S_{FV}'); ...
+subplot(2,1,1); plot(f(indexx)/1e6,pkss,'or'); hold on; plot(f./1e6,mag_tf,'b'); title('Frequency response of S_{FV}'); ...
     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
-subplot(2,1,2); plot(f./1e6,phase_tf,'b');  ...
+subplot(2,1,2); plot(f(indexx)/1e6,phase_tf(indexx),'or'); hold on;plot(f./1e6,phase_tf,'b');  ...
     xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); 
 
 

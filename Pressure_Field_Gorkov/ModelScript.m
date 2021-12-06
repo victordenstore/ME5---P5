@@ -124,7 +124,10 @@ x = linspace(0,5*0.0013,1000);                                              % Di
 % 2D plot which shows the pressure minima and maxima of the pressure field
 figure
 contourf(t,x, real(P_field), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('distance [m]'); title('Contourplot of the 1D pressurefield');
+xlabel('time [s]'); ylabel('x [m]'); title('Contourplot of the 1D pressurefield');
+hc=colorbar;
+title(hc,'Pa','FontSize',10);
+
 
 %% Surface plots of the standing pressure wave
 
@@ -221,19 +224,23 @@ time_averaged_vec = linspace(0,T,length(velocities));                       % Si
 figure                                                      
 tiledlayout(4,1); nexttile;
 contourf(x,time_averaged_vec,real(p_ms_vc), 14); colormap jet; colorbar;
-xlabel('distance [m]'); ylabel('time [s]'); title('<p^2>');
+title('<p^2>');
+set(gca,'XTick',[], 'YTick', []); colorbar('off')
 
 nexttile;
 contourf(x,time_averaged_vec,real(v_ms_vc), 14); colormap jet; colorbar;
-xlabel('distance [m]'); ylabel('time [s]'); title('<v^2>');
+title('<v^2>');
+set(gca,'XTick',[], 'YTick', []); colorbar('off')
 
 nexttile;
 contourf(x,time_averaged_vec,real(Uac_vc), 14); colormap jet; colorbar;
-xlabel('distance [m]'); ylabel('time [s]'); title('Uac');
+title('Uac');
+set(gca,'XTick',[], 'YTick', []); colorbar('off')
 
 nexttile;
 contourf(x,time_averaged_vec,real(Fac_vc), 14); colormap jet; colorbar;
-xlabel('distance [m]'); ylabel('time [s]'); title('Fac');
+title('Fac');
+set(gca,'XTick',[], 'YTick', []); colorbar('off')
 
 
 
