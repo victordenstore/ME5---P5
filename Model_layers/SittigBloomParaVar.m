@@ -99,9 +99,9 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-% l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
-l_glue = linspace(10,150,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
-l_glue = l_glue(:);
+l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
+% l_glue = linspace(10,150,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
+% l_glue = l_glue(:);
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
@@ -117,9 +117,9 @@ gamma_FeC = pi*f/f_0_FP;
 
 rho_house = rho_FeC;  
 c_house = c_FeC;    
-l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
-% l_house = linspace(0.5,1.5,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
-% l_house = l_house(:);
+% l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
+l_house = linspace(0.5,1.5,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
+l_house = l_house(:);
 r_house = 3.5*10^-3;
 A_house = pi*r_house^2;
 Z_0_house = rho_house * c_house * A_house;
@@ -358,14 +358,30 @@ figure(6)
 hold on
 
 handle = zeros(par_steps,1);
-
+names = ["Glue Thickness","Copper Thickness","Housing Thickness","Piezo Thickness"];
+types = [l_glue*10^6 l_Cu*10^3 l_house*10^3 l_pz*10^3];
+units = ["\mum","mm","mm","mm"];
+space =  " ";
 for uu = 1:length(l_glue)
 % row_begin = length(f)*uu-(length(f)-1);
 % row_end = length(f)*uu; legend('Theoretical system impedance');
 
+if l_glue(1) ~= l_glue(2)
+  class = 1;
+end
+if l_Cu(1) ~= l_Cu(2)
+  class = 2;
+end
+if l_house(1) ~= l_house(2)
+  class = 3;
+end
+if l_pz(1) ~= l_pz(2)
+  class = 4;
+end
+
 figure(1);
-subplot(2,1,1); handle(uu)=plot(f,mag_impedance(:,uu),'DisplayName', ['Glue Thickness', num2str(l_glue(uu)*10^6),'\mu','m']); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
-xlabel('frequency [Hz]'); ylabel('magnitude [DB]');  
+subplot(2,1,1); handle(uu)=plot(f,mag_impedance(:,uu),'DisplayName', [num2str(names(class)),num2str(space), num2str(types(uu,class)),num2str(space),num2str(units(class))]); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
+xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); 
 conversion_vec = 180*ones(length(freq_vec),1);
 subplot(2,1,2); plot(f,phase_impedance(:,uu)); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');  ...
 xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase'); ylim([-180 180]);
@@ -398,8 +414,9 @@ semilogy(f,mag_resistance(:,uu)); hold on; semilogy(freq_vec,mag_resistance2); t
  
 end
 
+legend([handle(1) handle(2) handle(3) handle(4) handle(5)]);
 
-legend([handle(1) handle(2) handle(3) handle(4) handle(5)])
+
 
 
 
