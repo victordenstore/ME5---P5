@@ -36,6 +36,8 @@ f = linspace(1,2*10^6,1000);
 omg = 2*pi*f;
 j = 1i;
 par_steps = 5;
+legend_steps = 1:1:par_steps;
+
 %% Setting up the backing material matrix
 
 % First the layer closest to the piezoelectric layer, hence the copper
@@ -99,9 +101,9 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
-% l_glue = linspace(10,150,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
-% l_glue = l_glue(:);
+% l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
+l_glue = linspace(10,150,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
+l_glue = l_glue(:);
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
@@ -117,9 +119,9 @@ gamma_FeC = pi*f/f_0_FP;
 
 rho_house = rho_FeC;  
 c_house = c_FeC;    
-% l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
-l_house = linspace(0.5,1.5,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
-l_house = l_house(:);
+l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
+% l_house = linspace(0.5,1.5,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
+% l_house = l_house(:);
 r_house = 3.5*10^-3;
 A_house = pi*r_house^2;
 Z_0_house = rho_house * c_house * A_house;
@@ -414,7 +416,7 @@ semilogy(f,mag_resistance(:,uu)); hold on; semilogy(freq_vec,mag_resistance2); t
  
 end
 
-legend([handle(1) handle(2) handle(3) handle(4) handle(5)]);
+legend([handle(legend_steps(1):legend_steps(end))]);
 
 
 
