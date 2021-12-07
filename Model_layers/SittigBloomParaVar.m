@@ -32,11 +32,32 @@ clear all; close all; clc;
 
 %% Parameter initialization
 
-f = linspace(1,2*10^6,1000);      
+f = linspace(1*10^5,1.5*10^6,1000);      
 omg = 2*pi*f;
 j = 1i;
-par_steps = 5;
+par_steps = 4;
 legend_steps = 1:1:par_steps;
+
+%% Parameter variation
+
+% depending on the type of parameter variation, one of the following
+% options for l_Cu should be chosen.
+l_Cu = ones(par_steps,1)*0.5e-3;   % choose this if the effect of one other parameter variation is to be obtained.                       
+% l_Cu = linspace(0.25,1,par_steps)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
+% l_Cu = l_Cu(:);
+
+% l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
+l_glue = linspace(50,200,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
+l_glue = l_glue(:);
+
+l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
+% l_house = linspace(0.5,2,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
+% l_house = l_house(:);
+
+
+l_pz = ones(par_steps,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
+% l_pz = linspace(0.5,2,par_steps)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
+% l_pz = l_pz(:);
 
 %% Setting up the backing material matrix
 
@@ -47,12 +68,6 @@ legend_steps = 1:1:par_steps;
 
 rho_Cu = 8960;  % Pure! copper density.
 c_Cu = 3570;    % pure copper speed of sound.
-
-% depending on the type of parameter variation, one of the following
-% options for l_Cu should be chosen.
-l_Cu = ones(par_steps,1)*0.5e-3;   % choose this if the effect of one other parameter variation is to be obtained.                       
-% l_Cu = linspace(0.4,0.6,par_steps)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
-% l_Cu = l_Cu(:);
 r_Cu = 2.5*10^-3;
 A_Cu = pi*r_Cu^2;
 Z_0_Cu = rho_Cu * c_Cu * A_Cu;
@@ -101,9 +116,6 @@ end
 
 rho_glue = 960;  
 c_glue = 1220;    % unsure about this!!
-% l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
-l_glue = linspace(10,150,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
-l_glue = l_glue(:);
 r_glue = 2.5*10^-3;
 A_glue = pi*r_glue^2;
 Z_0_glue = rho_glue * c_glue * A_glue;
@@ -119,9 +131,6 @@ gamma_FeC = pi*f/f_0_FP;
 
 rho_house = rho_FeC;  
 c_house = c_FeC;    
-l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
-% l_house = linspace(0.5,1.5,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
-% l_house = l_house(:);
 r_house = 3.5*10^-3;
 A_house = pi*r_house^2;
 Z_0_house = rho_house * c_house * A_house;
@@ -131,9 +140,6 @@ gamma_house = pi*f./f_0_house;
 % pz para
 rho_pz = 7800;  
 c_pz = 4613;    
-l_pz = ones(par_steps,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
-% l_pz = linspace(0.5,1.5,par_steps)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
-% l_pz = l_pz(:);
 r_pz = 2.5*10^-3;
 A_pz = pi*r_pz^2;
 Z_0_pz = rho_pz * c_pz * A_pz;
@@ -317,7 +323,9 @@ freq_vec = [freq; freq1];
 multiplyer = freq_vec(1:901)*1000;
 multiplyer2 = freq_vec(902:end)*1000000;
 freq_vec = [multiplyer; multiplyer2];
-phase_shift_vec = [phase_shift; phase_shift1];
+phase_shift_vec = [phase_shift; phase_shift1]-180;
+substitution  = find(phase_shift_vec>90);
+phase_shift_vec(substitution) = 180 - phase_shift_vec(substitution);
 ptp_voltage_vec = [ptp_voltage; ptp_voltage1];
 ptp_current_vec = [ptp_current; ptp_current1];
 ptp_trans2_vec = [ptp_trans2; ptp_trans21];
@@ -348,16 +356,16 @@ mag_conductance2 = 20*log10(abs(conductance2));
 % plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
 figure(1)
 hold on
-figure(2)
-hold on
-figure(3)
-hold on
-figure(4)
-hold on
-figure(5)
-hold on
-figure(6)
-hold on
+% figure(2)
+% hold on
+% figure(3)
+% hold on
+% figure(4)
+% hold on
+% figure(5)
+% hold on
+% figure(6)
+% hold on
 
 handle = zeros(par_steps,1);
 names = ["Glue Thickness","Copper Thickness","Housing Thickness","Piezo Thickness"];
@@ -381,42 +389,43 @@ if l_pz(1) ~= l_pz(2)
   class = 4;
 end
 
+
 figure(1);
-subplot(2,1,1); handle(uu)=plot(f,mag_impedance(:,uu),'DisplayName', [num2str(names(class)),num2str(space), num2str(types(uu,class)),num2str(space),num2str(units(class))]); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
-xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); 
-conversion_vec = 180*ones(length(freq_vec),1);
-subplot(2,1,2); plot(f,phase_impedance(:,uu)); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');  ...
-xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase'); ylim([-180 180]);
+subplot(2,1,1); handle(uu)=plot(f./1e6,mag_impedance(:,uu),'DisplayName', [num2str(names(class)),num2str(space), num2str(types(uu,class)),num2str(space),num2str(units(class))]); hold on; exp_data = plot(freq_vec./1e6,mag_impedance2,'r','DisplayName',["Experimental Data"]); title('Frequency response of the impedance'); ...
+xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); 
+subplot(2,1,2); phase_handle(uu)=plot(f./1e6,phase_impedance(:,uu),'DisplayName', [num2str(names(class)),num2str(space), num2str(types(uu,class)),num2str(space),num2str(units(class))]); hold on; exp_data1 =  plot(freq_vec./1e6,phase_impedance2,'r','DisplayName',["Experimental Data"]);  ...
+xlabel('frequency [MHz]'); ylabel('phase [degree]'); ylim([-180 180]);
 
-figure(2);
-subplot(2,1,1);  plot(f./1e6,mag_tf(:,uu)); hold on; title('Frequency response of S_{FV}'); ...
-    xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
-subplot(2,1,2); plot(f./1e6,phase_tf(:,uu)); hold on; ...
-    xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); 
-
-figure(3);
-subplot(2,1,1); plot(f./1e6,mag_admittance(:,uu)); hold on; plot(freq_vec./1e6,mag_admittance2,'r');title('Bode magnitude plot of the admittance'); ...
-    xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
-subplot(2,1,2); plot(f./1e6,phase_admittance(:,uu));  hold on; plot(freq_vec./1e6,-phase_admittance2,'r');
- title('Theoretical system admittance phase'); ...
-    xlabel('frequency [MHz]'); ylabel('phase [degree]'); ylim([-150 150])
-
-figure(4)
-plot(f,susceptance(:,uu)); hold on; plot(freq_vec,susceptance2,'r'); title('Bode magnitude plot of the susceptance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
-
-figure(5)
-semilogy(f,mag_conductance(:,uu)); hold on; semilogy(freq_vec,mag_conductance2); title('magnitude plot of the conductance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
-
-figure(6)
-semilogy(f,mag_resistance(:,uu)); hold on; semilogy(freq_vec,mag_resistance2); title('magnitude plot of the resistance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+% figure(2);
+% subplot(2,1,1);  plot(f./1e6,mag_tf(:,uu)); hold on; title('Frequency response of S_{FV}'); ...
+%     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
+% subplot(2,1,2); plot(f./1e6,phase_tf(:,uu)); hold on; ...
+%     xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); 
+% 
+% figure(3);
+% subplot(2,1,1); plot(f./1e6,mag_admittance(:,uu)); hold on; plot(freq_vec./1e6,mag_admittance2,'r');title('Bode magnitude plot of the admittance'); ...
+%     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
+% subplot(2,1,2); plot(f./1e6,phase_admittance(:,uu));  hold on; plot(freq_vec./1e6,-phase_admittance2,'r');
+%  title('Theoretical system admittance phase'); ...
+%     xlabel('frequency [MHz]'); ylabel('phase [degree]'); ylim([-150 150])
+% 
+% figure(4)
+% plot(f,susceptance(:,uu)); hold on; plot(freq_vec,susceptance2,'r'); title('Bode magnitude plot of the susceptance'); ...
+%     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+% 
+% figure(5)
+% semilogy(f,mag_conductance(:,uu)); hold on; semilogy(freq_vec,mag_conductance2); title('magnitude plot of the conductance'); ...
+%     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
+% 
+% figure(6)
+% semilogy(f,mag_resistance(:,uu)); hold on; semilogy(freq_vec,mag_resistance2); title('magnitude plot of the resistance'); ...
+%     xlabel('frequency [Hz]'); ylabel('magnitude [DB]');
 
  
 end
 
-legend([handle(legend_steps(1):legend_steps(end))]);
+legend([exp_data; handle(legend_steps(1):legend_steps(end))]);
+legend([phase_handle(legend_steps(1):legend_steps(end))]);
 
 
 

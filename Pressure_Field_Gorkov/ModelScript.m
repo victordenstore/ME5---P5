@@ -88,7 +88,7 @@ S_FV=Z_r*S_vI/Z_in;                                                           % 
 
 V_M = 75;                                                                    % Input voltage
 lambda =c/f;                                                                  % wavelength of the pressure field
-F_surface = V_M * (0.0712 + 0.0767i);                                                       % Total force on trasnducer surface
+F_surface = V_M * (0.022263438989114 + 0.051310764286517i);                                                       % Total force on trasnducer surface
 P_surface = F_surface/(S_a);                                                  % pressure on the transducer surface
 
 %% Translation to the 1D pressure field

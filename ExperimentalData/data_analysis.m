@@ -62,7 +62,9 @@ freq_vec = [freq; freq1];
 multiplyer = freq_vec(1:901)*1000;
 multiplyer2 = freq_vec(902:end)*1000000;
 freq_vec = [multiplyer; multiplyer2];
-phase_shift_vec = [phase_shift; phase_shift1];
+phase_shift_vec = [phase_shift; phase_shift1]-180;
+substitution  = find(phase_shift_vec>90);
+phase_shift_vec(substitution) = 180 - phase_shift_vec(substitution);
 phase_shift_vec2 = [phase_shift_CH2_CH3; phase_shift2];
 ptp_voltage_vec = [ptp_voltage; ptp_voltage1];
 ptp_current_vec = [ptp_current; ptp_current1];
@@ -75,7 +77,7 @@ current_phasor = current_phasor_amp.*exp(j*current_angle);
 current_angle2 = deg2rad(phase_shift_vec2);
 current_phasor2 = current_phasor_amp.*exp(j*current_angle2);
 
-impedance_phasor = (ptp_voltage_vec./2)./current_phasor;
+impedance_phasor = ((ptp_voltage_vec./2))./current_phasor;
 impedance_phasor2 = (ptp_voltage_vec./2)./current_phasor2;
 
 
@@ -96,8 +98,8 @@ susceptance = imag(admittance);
 
 figure
 cv = 180*ones(length(freq_vec),1);
-plot(freq_vec,phase_impedance-cv,'g'); hold on; plot(freq_vec,phase_impedance2,'r'); title('Phase plot of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Measurement location 2','Measurement location 1');
+plot(freq_vec,phase_impedance2,'r'); hold on; plot(freq_vec,phase_impedance,'g'); title('Phase plot of the impedance'); ...
+    xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Measurement location 1','Measurement location 2');
 
 % ptp_trans2_vec = ptp_trans2_vec./2000;
 % mag_trans2 = 20*log10(abs(ptp_trans2_vec));

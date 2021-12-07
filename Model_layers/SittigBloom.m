@@ -19,7 +19,7 @@ clear all; close all; clc;
 
 %% Parameter initialization
 
-f = 0.43*10^6;      
+f = 0.434154*10^6;      
 omg = 2*pi*f;
 j = 1i;
 %% Setting up the backing material matrix

@@ -367,7 +367,9 @@ freq_vec = [freq; freq1];
 multiplyer = freq_vec(1:901)*1000;
 multiplyer2 = freq_vec(902:end)*1000000;
 freq_vec = [multiplyer; multiplyer2];
-phase_shift_vec = [phase_shift; phase_shift1];
+phase_shift_vec = [phase_shift; phase_shift1]-180;
+substitution  = find(phase_shift_vec>90);
+phase_shift_vec(substitution) = 180 - phase_shift_vec(substitution);
 ptp_voltage_vec = [ptp_voltage; ptp_voltage1];
 ptp_current_vec = [ptp_current; ptp_current1];
 ptp_trans2_vec = [ptp_trans2; ptp_trans21];
@@ -403,9 +405,8 @@ mag_conductance2 = 20*log10(abs(conductance2));
 
 figure
 subplot(2,1,1); plot(f,mag_impedance,'b'); hold on; plot(freq_vec,mag_impedance2,'r'); title('Frequency response of the impedance'); ...
-    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance','Experimental system inpedance'); xline(430000); xline(450000)
-conversion_vec = 180*ones(length(freq_vec),1);
-subplot(2,1,2); plot(f,phase_impedance,'b'); hold on; plot(freq_vec,phase_impedance2-conversion_vec,'r');   ...
+    xlabel('frequency [Hz]'); ylabel('magnitude [DB]'); legend('Theoretical system impedance','Experimental system inpedance'); 
+subplot(2,1,2); plot(f,phase_impedance,'b'); hold on; plot(freq_vec,phase_impedance2,'r');   ...
     xlabel('frequency [Hz]'); ylabel('phase [degree]'); legend('Theoretical system impedance phase','Experimental system impedance phase'); ylim([-180 180]);
 
 
