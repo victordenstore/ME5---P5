@@ -42,28 +42,32 @@ legend_steps = 1:1:par_steps;
 
 % depending on the type of parameter variation, one of the following
 % options for l_Cu should be chosen.
-l_Cu = ones(par_steps,1)*0.5e-3;   % choose this if the effect of one other parameter variation is to be obtained.                       
-% l_Cu = linspace(0.25,1,par_steps)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
-% l_Cu = l_Cu(:);
+% l_Cu = ones(par_steps,1)*0.5e-3;   % choose this if the effect of one other parameter variation is to be obtained.                       
+l_Cu = linspace(0.25,1,par_steps)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
+l_Cu = l_Cu(:);
 
 l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
 % l_glue = linspace(50,200,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
 % l_glue = l_glue(:);
-l_glue(2) = 101e-6;
+% l_glue(2) = 101e-6;
 
 l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
 % l_house = linspace(0.5,2,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
 % l_house = l_house(:);
 
 
-% l_pz = ones(par_steps,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
-l_pz = linspace(0.5,3,par_steps)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
-l_pz = l_pz(:);
+l_pz = ones(par_steps,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
+% l_pz = linspace(0.5,3,par_steps)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
+% l_pz = l_pz(:);
 
 % k-factor
 k = 0.46*ones(par_steps,1);
 % k = linspace(0.01,2.1,par_steps)*0.46;
 % k = k(:);
+
+% l_Ag = ones(par_steps,1)*100e-6;
+l_Ag = linspace(0.999,1.001,par_steps)*100e-6;
+l_Ag = l_Ag(:);
 
 %% Setting up the backing material matrix
 
@@ -143,6 +147,14 @@ Z_0_house = rho_house * c_house * A_house;
 f_0_house = c_house./(2*l_house);
 gamma_house = pi*f./f_0_house;
 
+rho_Ag = 10490;  % Pure! silver density.
+c_Ag = 2600;    % pure silver speed of sound.
+r_Ag = 2.5*10^-3;
+A_Ag = pi*r_Ag^2;
+Z_0_Ag = rho_Ag * c_Ag * A_Ag;
+f_0_Ag = c_Ag./(2*l_Ag);
+gamma_Ag = pi*f./f_0_Ag;
+
 % pz para
 rho_pz = 7800;  
 c_pz = 4613;    
@@ -181,13 +193,15 @@ T_42 = -h*C_s.*tan(0.5*phi).*sin(N*phi);
 T_43 = j*((N*(-1)^N)*(1+2*sigma.*R_inv.*tan(0.5*phi))+sigma.*R_inv.*((tan(0.5*phi)).^2).*sin(N*phi)).*omg.*C_s;
 T_44 = (-1)^N;
 
+inductance_c = 204e-6;
 k_c = omg/(2/3*3*10^8);                                %Wave number in cable
 l_c = 1;                                              %Length of cable
-Z_c = j*2*10^-3*omg;                                      %Impedance of cable
+Z_c = j*inductance_c*omg;                                      %Impedance of cable
 T_c_11 = cos(k_c*l_c);                                   %Transfer matrix of cable
 T_c_12 = -j*Z_c.*sin(k_c*l_c);
 
 glue_mat = zeros(2*length(f),2*length(l_glue));
+Back_mat_Ag = zeros(2*length(f),2*length(l_glue));
 Back_mat = zeros(2*length(f),2*length(l_glue));
 Z_b = zeros(length(f),length(l_glue));
 Trans_mat = zeros(2*length(f),2*length(l_glue));
@@ -205,10 +219,13 @@ row1 = 2*han-1;
 row2 = 2*han;
     glue_mat(row1:row2,col1:col2) = [cos(gamma_glue(han)) j*Z_0_glue*sin(gamma_glue(han)); ...
                (j*sin(gamma_glue(han)))/Z_0_glue cos(gamma_glue(han))];
+Back_mat_Ag(row1:row2,col1:col2) = [cos(gamma_Ag(han)) j*Z_0_Ag*sin(gamma_Ag(han)); ...
+               (j*sin(gamma_Ag(han)))/Z_0_Ag cos(gamma_Ag(han))];
+          
            
 % The matrices are multiplied and the total impedance Z_b of the backing
 % layers is obtained.
-Back_mat(row1:row2,col1:col2) = glue_mat(row1:row2,col1:col2)*Back_mat_Cu(row1:row2,col1:col2) ...
+Back_mat(row1:row2,col1:col2) = Back_mat_Ag(row1:row2,col1:col2)*glue_mat(row1:row2,col1:col2)*Back_mat_Cu(row1:row2,col1:col2) ...
     *glue_mat(row1:row2,col1:col2)*Back_mat_FeC(row1:row2,1:2);
 Back_mat_current = Back_mat(row1:row2,col1:col2);
 A_b = Back_mat_current(1,1);
@@ -224,8 +241,8 @@ Trans_mat_FP = [cos(gamma_FeC(han)) j*Z_0_FP*sin(gamma_FeC(han)); ...
                 (j*sin(gamma_FeC(han)))/Z_0_FP cos(gamma_FeC(han))];
 house_mat = [cos(gamma_house(er,han)) j*Z_0_house*sin(gamma_house(er,han)); ...
                (j*sin(gamma_house(er,han)))/Z_0_house cos(gamma_house(er,han))];
-Trans_mat(row1:row2,col1:col2) = glue_mat(row1:row2,col1:col2)*Trans_mat_Cu ...
-    * glue_mat(row1:row2,col1:col2)*Trans_mat_FP*house_mat;
+Trans_mat(row1:row2,col1:col2) = Back_mat_Ag(row1:row2,col1:col2)* glue_mat(row1:row2,col1:col2)*Trans_mat_Cu ...
+   *Back_mat_Ag(row1:row2,col1:col2)*Back_mat_Ag(row1:row2,col1:col2)*glue_mat(row1:row2,col1:col2)*Trans_mat_FP*house_mat;
 z_b = Z_b(han,er)/Z_0_pz;
 
 A_c = T_31 - T_33*(T_21(er,han)*z_b + T_11(er,han))/(T_23(er,han)*z_b + T_13(er,han));
@@ -243,7 +260,7 @@ D = Final_trans_mat1(2,2);
 Z_FP = Z_0_FeC;
 Z_E(han,er) = -(A*Z_FP + B)/(C*Z_FP + D)*T_c_11(han)+T_c_12(han);            % electrical input impedance
 V_IL(han,er) = Z_FP/(A*Z_FP + B);   
-phase_tf(han,er) = rad2deg(phase(V_IL(han,er)));
+phase_tf(han,er) = rad2deg(angle(V_IL(han,er)));
 end
 end         
 
@@ -378,9 +395,9 @@ hold on
 % hold on
 
 handle = zeros(par_steps,1);
-names = ["Glue Thickness","Copper Thickness","Housing Thickness","Piezo Thickness","k-factor"];
-types = [l_glue*10^6 l_Cu*10^3 l_house*10^3 l_pz*10^3 k];
-units = ["\mum","mm","mm","mm","[-]"];
+names = ["Glue Thickness","Copper Thickness","Housing Thickness","Piezo Thickness","k-factor","Silver Thickness"];
+types = [l_glue*10^6 l_Cu*10^3 l_house*10^3 l_pz*10^3 k l_Ag*10^6];
+units = ["\mum","mm","mm","mm","[-]","\mum"];
 space =  " ";
 for uu = 1:length(l_glue)
 % row_begin = length(f)*uu-(length(f)-1);
@@ -400,6 +417,9 @@ if l_pz(1) ~= l_pz(2)
 end
 if k(1) ~= k(2)
     class = 5;
+end
+if l_Ag(1) ~= l_Ag(2)
+    class = 6;
 end
 
 

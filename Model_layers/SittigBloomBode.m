@@ -24,8 +24,30 @@ omg = 2*pi*f;
 j = 1i;
 %% Setting up the backing material matrix
 
-% First the layer closest to the piezoelectric layer, hence the copper
+
+
+% First the layer closest to the piezoelectric layer, hence the silver
 % electrode.
+
+
+
+rho_Ag = 10490;  % Pure! silver density.
+c_Ag = 2600;    % pure silver speed of sound.
+l_Ag = 100*10^-6;
+r_Ag = 2.5*10^-3;
+A_Ag = pi*r_Ag^2;
+Z_0_Ag = rho_Ag * c_Ag * A_Ag;
+f_0_Ag = c_Ag/(2*l_Ag);
+gamma_Ag = pi*f/f_0_Ag;
+
+Back_mat_Ag = zeros(2*length(f),2);
+
+for per = 1:length(f)
+row1 = 2*per-1;
+row2 = 2*per;
+Back_mat_Ag(row1:row2,1:2) = [cos(gamma_Ag(per)) j*Z_0_Ag*sin(gamma_Ag(per)); ...
+               (j*sin(gamma_Ag(per)))/Z_0_Ag cos(gamma_Ag(per))];
+end
 
 % the material parameters
 
@@ -102,7 +124,7 @@ for ii = 1:length(f)
 row1 = 2*ii-1;
 row2 = 2*ii;
     
-Back_mat(row1:row2,1:2) = glue_mat(row1:row2,1:2)*Back_mat_Cu(row1:row2,1:2) ...
+Back_mat(row1:row2,1:2) = Back_mat_Ag(row1:row2,1:2)*glue_mat(row1:row2,1:2)*Back_mat_Cu(row1:row2,1:2) ...
     *glue_mat(row1:row2,1:2)*Back_mat_FeC(row1:row2,1:2);
 Back_mat_current = Back_mat(row1:row2,1:2);
 A_b = Back_mat_current(1,1);
@@ -179,8 +201,8 @@ for xx = 1:length(f)
 row1 = 2*xx-1;
 row2 = 2*xx;
 
-Trans_mat(row1:row2,1:2) = glue_mat(row1:row2,1:2)*Trans_mat_Cu(row1:row2,1:2) ...
-    * glue_mat(row1:row2,1:2)*Trans_mat_FP(row1:row2,1:2)*house_mat(row1:row2,1:2);
+Trans_mat(row1:row2,1:2) = Back_mat_Ag(row1:row2,1:2)*glue_mat(row1:row2,1:2)*Trans_mat_Cu(row1:row2,1:2) ...
+   * Back_mat_Ag(row1:row2,1:2) * Back_mat_Ag(row1:row2,1:2)*glue_mat(row1:row2,1:2)*Trans_mat_FP(row1:row2,1:2)*house_mat(row1:row2,1:2);
 end
                    
 %% Setting up the matrix describing the active Piezoelectric layer
@@ -262,10 +284,10 @@ end
 %% Defining the sensitivity functions
 Z_E = zeros(length(f),1);
 V_IL = zeros(length(f),1);
-inductance_cable = 4.3*10^-6;
+inductance_cable = 204*10^-6;
 k_c = omg/(2/3*3*10^8);                                %Wave number in cable
 l_c = 1;                                              %Length of cable
-Z_c = j*8.6*10^-4*omg;                                      %Impedance of cable
+Z_c = j*inductance_cable*omg;                                      %Impedance of cable
 T_c_11 = cos(k_c*l_c);                                   %Transfer matrix of cable
 T_c_12 = -j*Z_c.*sin(k_c*l_c);                         %Transfer matrix of cable
 
