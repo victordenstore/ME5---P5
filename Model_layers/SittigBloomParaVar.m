@@ -28,14 +28,14 @@
 % ones(10,1)*specific_value.
 
 %% close all former work
-clear all; close all; clc;
+clear; close all; clc;
 
 %% Parameter initialization
 
 f = linspace(1*10^5,1.5*10^6,1000);      
 omg = 2*pi*f;
 j = 1i;
-par_steps = 4;
+par_steps = 3;
 legend_steps = 1:1:par_steps;
 
 %% Parameter variation
@@ -46,18 +46,24 @@ l_Cu = ones(par_steps,1)*0.5e-3;   % choose this if the effect of one other para
 % l_Cu = linspace(0.25,1,par_steps)*1e-3;   % Choose this to either see the effect of variations in copper thickness, or to combine parameter variation.
 % l_Cu = l_Cu(:);
 
-% l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
-l_glue = linspace(50,200,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
-l_glue = l_glue(:);
+l_glue = ones(par_steps,1)*100e-6;    % choose this if the effect of one other parameter variation is to be obtained.
+% l_glue = linspace(50,200,par_steps)*10^-6; % Choose this to either see the effect of variations in glue thickness, or to combine parameter variation.
+% l_glue = l_glue(:);
+l_glue(2) = 101e-6;
 
 l_house = ones(par_steps,1)*3.25*10^-3;   % choose this if the effect of one other parameter variation is to be obtained. 
 % l_house = linspace(0.5,2,par_steps)*3.25*10^-3;  % Choose this to either see the effect of variations in housing thickness, or to combine parameter variation.
 % l_house = l_house(:);
 
 
-l_pz = ones(par_steps,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
-% l_pz = linspace(0.5,2,par_steps)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
-% l_pz = l_pz(:);
+% l_pz = ones(par_steps,1)*2e-3;  % choose this if the effect of one other parameter variation is to be obtained.
+l_pz = linspace(0.5,3,par_steps)*2e-3; % Choose this to either see the effect of variations in piezo thickness, or to combine parameter variation.
+l_pz = l_pz(:);
+
+% k-factor
+k = 0.46*ones(par_steps,1);
+% k = linspace(0.01,2.1,par_steps)*0.46;
+% k = k(:);
 
 %% Setting up the backing material matrix
 
@@ -154,8 +160,7 @@ h = h_33;
 Z = A_pz*rho_pz*c_pz;
 Z_inv = 1/Z;
 theta = omg.*l_pz./c_pz;
-k = 0.46;
-sigma = k^2./theta;
+sigma = k.^2./theta;
 phi = acos((cos(theta)-sigma.*sin(theta))./(1-sigma.*sin(theta)));
 R = (sqrt(sin(theta)-2*sigma.*(1-cos(theta))))./sin(theta);
 R_inv = 1./R;
@@ -175,7 +180,12 @@ T_41 = -j*h*C_s.*Z_inv.*R_inv.*tan(0.5*phi).*(cos(N*phi)-(-1)^N);
 T_42 = -h*C_s.*tan(0.5*phi).*sin(N*phi);
 T_43 = j*((N*(-1)^N)*(1+2*sigma.*R_inv.*tan(0.5*phi))+sigma.*R_inv.*((tan(0.5*phi)).^2).*sin(N*phi)).*omg.*C_s;
 T_44 = (-1)^N;
-inductance_cable = 4.3*10^-6;
+
+k_c = omg/(2/3*3*10^8);                                %Wave number in cable
+l_c = 1;                                              %Length of cable
+Z_c = j*2*10^-3*omg;                                      %Impedance of cable
+T_c_11 = cos(k_c*l_c);                                   %Transfer matrix of cable
+T_c_12 = -j*Z_c.*sin(k_c*l_c);
 
 glue_mat = zeros(2*length(f),2*length(l_glue));
 Back_mat = zeros(2*length(f),2*length(l_glue));
@@ -231,7 +241,7 @@ B = Final_trans_mat1(1,2);
 C = Final_trans_mat1(2,1);
 D = Final_trans_mat1(2,2);
 Z_FP = Z_0_FeC;
-Z_E(han,er) = -(A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
+Z_E(han,er) = -(A*Z_FP + B)/(C*Z_FP + D)*T_c_11(han)+T_c_12(han);            % electrical input impedance
 V_IL(han,er) = Z_FP/(A*Z_FP + B);   
 phase_tf(han,er) = rad2deg(phase(V_IL(han,er)));
 end
@@ -356,8 +366,8 @@ mag_conductance2 = 20*log10(abs(conductance2));
 % plot(f(ind1),pks1,'or'); hold on; plot(f(ind),pks,'or'); hold on;
 figure(1)
 hold on
-% figure(2)
-% hold on
+figure(2)
+hold on
 % figure(3)
 % hold on
 % figure(4)
@@ -368,9 +378,9 @@ hold on
 % hold on
 
 handle = zeros(par_steps,1);
-names = ["Glue Thickness","Copper Thickness","Housing Thickness","Piezo Thickness"];
-types = [l_glue*10^6 l_Cu*10^3 l_house*10^3 l_pz*10^3];
-units = ["\mum","mm","mm","mm"];
+names = ["Glue Thickness","Copper Thickness","Housing Thickness","Piezo Thickness","k-factor"];
+types = [l_glue*10^6 l_Cu*10^3 l_house*10^3 l_pz*10^3 k];
+units = ["\mum","mm","mm","mm","[-]"];
 space =  " ";
 for uu = 1:length(l_glue)
 % row_begin = length(f)*uu-(length(f)-1);
@@ -388,6 +398,9 @@ end
 if l_pz(1) ~= l_pz(2)
   class = 4;
 end
+if k(1) ~= k(2)
+    class = 5;
+end
 
 
 figure(1);
@@ -396,12 +409,12 @@ xlabel('frequency [MHz]'); ylabel('magnitude [DB]');
 subplot(2,1,2); phase_handle(uu)=plot(f./1e6,phase_impedance(:,uu),'DisplayName', [num2str(names(class)),num2str(space), num2str(types(uu,class)),num2str(space),num2str(units(class))]); hold on; exp_data1 =  plot(freq_vec./1e6,phase_impedance2,'r','DisplayName',["Experimental Data"]);  ...
 xlabel('frequency [MHz]'); ylabel('phase [degree]'); ylim([-180 180]);
 
-% figure(2);
-% subplot(2,1,1);  plot(f./1e6,mag_tf(:,uu)); hold on; title('Frequency response of S_{FV}'); ...
-%     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
-% subplot(2,1,2); plot(f./1e6,phase_tf(:,uu)); hold on; ...
-%     xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); 
-% 
+figure(2);
+subplot(2,1,1);  plot(f./1e6,mag_tf(:,uu)); hold on; title('Frequency response of S_{FV}'); ...
+    xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system frequency response'); ylim([-250 50])
+subplot(2,1,2); plot(f./1e6,phase_tf(:,uu)); hold on; ...
+    xlabel('frequency [MHz]'); ylabel('phase [degree]'); legend('Theoretical system frequency response'); 
+
 % figure(3);
 % subplot(2,1,1); plot(f./1e6,mag_admittance(:,uu)); hold on; plot(freq_vec./1e6,mag_admittance2,'r');title('Bode magnitude plot of the admittance'); ...
 %     xlabel('frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');

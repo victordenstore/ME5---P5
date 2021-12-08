@@ -265,7 +265,7 @@ V_IL = zeros(length(f),1);
 inductance_cable = 4.3*10^-6;
 k_c = omg/(2/3*3*10^8);                                %Wave number in cable
 l_c = 1;                                              %Length of cable
-Z_c = j*4.3*10^-6*omg;                                      %Impedance of cable
+Z_c = j*8.6*10^-4*omg;                                      %Impedance of cable
 T_c_11 = cos(k_c*l_c);                                   %Transfer matrix of cable
 T_c_12 = -j*Z_c.*sin(k_c*l_c);                         %Transfer matrix of cable
 
@@ -280,7 +280,7 @@ D = Final_trans_mat1(2,2);
 
 Z_FP = Z_0_FeC;
 %Z_E(g) = -(A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
-Z_E(g) = -((A*Z_FP + B)*T_c_11(g)+T_c_12(g))/(C*Z_FP + D); 
+Z_E(g) = -(A*Z_FP + B)/(C*Z_FP + D) *T_c_11(g)+T_c_12(g); 
 %V_IL(g) = Z_FP/(A*Z_FP + B);                                % voltage transfer ratio between input voltage and output force
 V_IL(g) = Z_FP/((A*Z_FP + B)*T_c_11(g)+T_c_12(g));
 end
