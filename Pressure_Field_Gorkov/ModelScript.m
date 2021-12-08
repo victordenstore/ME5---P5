@@ -63,6 +63,11 @@ Vis=Kin_Vis*rho_2;               % Dynamic viscosity of the fluid
 R=((c*rho_2)-(c_2*rho_3))/((c*rho_2)+(c_2*rho_3)); %Reflection coefficient 
 L=0.04485;                                         %Lentgh of chamber
 
+k_c = w/(2/3*3*10^8);                                %Wave number in cable
+l_c = 1;                                              %Length of cable
+Z_c = 4.3*10^-6;                                      %Impedance of cable
+T_c_11 = cos(k_c*l_c);                                   %Transfer matrix of cable
+T_c_12 = -1i*Z_c*sin(k_c*l_c);                         %Transfer matrix of cable
 
 %% Matricies used in the Sittig Model
 
@@ -82,13 +87,13 @@ S_vI=1/(Z_r*TA_matrix(2,1)+TA_matrix(2,2));                                   %S
 
 Z_in=(Z_r*TA_matrix(1,1)+TA_matrix(1,2))/(Z_r*TA_matrix(2,1)+TA_matrix(2,2)); %Electrical impedance of the transducer
 
-S_FV=Z_r*S_vI/Z_in;                                                           % Sensitivity FV
-
+% S_FV=Z_r*S_vI/Z_in;                                                           % Sensitivity FV
+S_FV = Z_r*S_vI/(Z_in*T_c_11+T_c_12);                                           %Sensitivity with cables
 %% Pressure at the transducer surface
 
 V_M = 75;                                                                    % Input voltage
 lambda =c/f;                                                                  % wavelength of the pressure field
-F_surface = V_M * (0.022263438989114 + 0.051310764286517i);                                                       % Total force on trasnducer surface
+F_surface = V_M * (0.0712 + 0.0767i);                                                       % Total force on trasnducer surface
 P_surface = F_surface/(S_a);                                                  % pressure on the transducer surface
 
 %% Translation to the 1D pressure field
@@ -124,10 +129,7 @@ x = linspace(0,5*0.0013,1000);                                              % Di
 % 2D plot which shows the pressure minima and maxima of the pressure field
 figure
 contourf(t,x, real(P_field), 14); colormap jet; colorbar;
-xlabel('time [s]'); ylabel('x [m]'); title('Contourplot of the 1D pressurefield');
-hc=colorbar;
-title(hc,'Pa','FontSize',10);
-
+xlabel('time [s]'); ylabel('distance [m]'); title('Contourplot of the 1D pressurefield');
 
 %% Surface plots of the standing pressure wave
 
@@ -138,7 +140,7 @@ xlabel('time [s]'); ylabel('distance [m]'); zlabel('pressure [Pa]'); title('Surf
 
 
  
-%% Constants used to calculate the acoustic radiation force
+% Constants used to calculate the acoustic radiation force
 
 rho_p = 1.225;                                                                  %Air density [kg/m^3]
 r = 80*10^-6;                                                                   %Bubble radius [m]
@@ -224,23 +226,19 @@ time_averaged_vec = linspace(0,T,length(velocities));                       % Si
 figure                                                      
 tiledlayout(4,1); nexttile;
 contourf(x,time_averaged_vec,real(p_ms_vc), 14); colormap jet; colorbar;
-title('<p^2>');
-set(gca,'XTick',[], 'YTick', []); colorbar('off')
+xlabel('distance [m]'); ylabel('time [s]'); title('<p^2>');
 
 nexttile;
 contourf(x,time_averaged_vec,real(v_ms_vc), 14); colormap jet; colorbar;
-title('<v^2>');
-set(gca,'XTick',[], 'YTick', []); colorbar('off')
+xlabel('distance [m]'); ylabel('time [s]'); title('<v^2>');
 
 nexttile;
 contourf(x,time_averaged_vec,real(Uac_vc), 14); colormap jet; colorbar;
-title('Uac');
-set(gca,'XTick',[], 'YTick', []); colorbar('off')
+xlabel('distance [m]'); ylabel('time [s]'); title('Uac');
 
 nexttile;
 contourf(x,time_averaged_vec,real(Fac_vc), 14); colormap jet; colorbar;
-title('Fac');
-set(gca,'XTick',[], 'YTick', []); colorbar('off')
+xlabel('distance [m]'); ylabel('time [s]'); title('Fac');
 
 
 

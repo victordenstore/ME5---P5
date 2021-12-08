@@ -251,6 +251,11 @@ row2 = 2*yy;
 
 Final_trans_mat(row1:row2,1:2) = pz_mat(row1:row2,1:2) * Trans_mat(row1:row2,1:2);
 end
+k_c = omg/(2/3*3*10^8);                                %Wave number in cable
+l_c = 1;                                              %Length of cable
+Z_c = j*4.3*10^-6*omg;                                      %Impedance of cable
+T_c_11 = cos(k_c*l_c);                                   %Transfer matrix of cable
+T_c_12 = -j*Z_c.*sin(k_c*l_c);                         %Transfer matrix of cable
 
 %% Defining the sensitivity functions
 Z_E = zeros(length(f),1);
@@ -266,8 +271,10 @@ C = Final_trans_mat1(2,1);
 D = Final_trans_mat1(2,2);
 
 Z_FP = Z_0_FeC;
-Z_E(g) = (A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
-V_IL(g) = Z_FP/(A*Z_FP + B);                   % voltage transfer ratio between input voltage and output force
+%Z_E(g) = (A*Z_FP + B)/(C*Z_FP + D);            % electrical input impedance
+Z_E(g) = ((A*Z_FP + B)*T_c_11(g)+T_c_12(g))/(C*Z_FP + D);
+%V_IL(g) = Z_FP/(A*Z_FP + B);                   % voltage transfer ratio between input voltage and output force
+V_IL(g) = Z_FP/((A*Z_FP + B)*T_c_11(g)+T_c_12(g));
 end
 
 admittance = 1./Z_E;

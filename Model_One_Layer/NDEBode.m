@@ -5,7 +5,7 @@ clc;
 x=0.0000042;
 
 %% intialization
-f = linspace(1,2*10^6,1000);
+f = linspace(1,10*10^6,1000);
 w=2*pi*f; % System frequency in rad/s, w=linspace(2.3064*pi*f,2.3068*pi*f,10000); 
 a=2.5*10^-3;                     % Radius of the piezoelectric plate
 S=pi*a^2;                        % Piezoelectric surface area
@@ -42,6 +42,13 @@ k_2=w/c_2;                       % wave number of the coating material of the tr
 d_2=0.5*10^-3;                    % thickness of the coating material of the transducer source
 S_m=(4.5*10^-3)^2*pi;             % Face area of the coating material fo the transducer soruce
 Z_m=rho_3*c_2*S_m;               % The acoustic impedance of the coating material of the transducer source
+
+k_c = w/(2/3*3*10^8);                                %Wave number in cable
+l_c = 1;                                              %Length of cable
+Z_c = 1i*4.3*10^-6*w;                                      %Impedance of cable
+T_c_11 = cos(k_c*l_c);                                   %Transfer matrix of cable
+T_c_12 = -1i*Z_c.*sin(k_c*l_c);                         %Transfer matrix of cable
+
 %% TA Matrix
 T_A_11 = zeros(length(w),1);
 T_A_12 = zeros(length(w),1);
@@ -76,8 +83,9 @@ T_A_final1 = T_A_final(boy:boy1,1:2);
 S_A_vl(nn) = 1/(Z_Aa_r*T_A_final1(2,1) + T_A_final1(2,2));
 
 Z_Ae_in(nn) = (Z_Aa_r*T_A_final1(1,1) + T_A_final1(1,2))/(Z_Aa_r*T_A_final1(2,1) + T_A_final1(2,2));
-
-S_FV(nn) = Z_Aa_r * S_A_vl(nn)/Z_Ae_in(nn);
+Z_Ae_in_c(nn) = (Z_Ae_in(nn)*T_c_11(nn)+T_c_12(nn));
+%S_FV(nn) = Z_Aa_r * S_A_vl(nn)/Z_Ae_in(nn);
+S_FV(nn) = Z_Aa_r * S_A_vl(nn)/Z_Ae_in_c(nn);
 end
 
 phase = rad2deg(angle(S_FV));
@@ -99,34 +107,29 @@ ylabel('Phase [deg]'); legend('theoretical system phase'); grid on;
 figure
 tiledlayout(2,1);
 nexttile
-Z_Ae_in1 =  abs(Z_Ae_in);
+Z_Ae_in1 =  abs(Z_Ae_in_c);
 plot(f/(1e6),Z_Ae_in1,'b');title('Frequency response of the impedance'); ...
     xlabel('Frequency [MHz]'); ylabel('magnitude [\Omega]'); legend('theoretical system impedance'); grid on;
 ylim([4000 80000])
 nexttile
-phase1 = rad2deg(angle(Z_Ae_in));
+phase1 = rad2deg(angle(Z_Ae_in_c));
 plot(f/(1e6),phase1,'b');xlabel('Frequency [MHz]'); ylabel('Phase [deg]'); legend('theoretical system impedance phase');
 grid on; ylim([70 100])
 
-admittance = 1./Z_Ae_in;
-phase_ad1 = rad2deg(angle(admittance));
-mag_ad = 20*log10(abs(admittance));
-
-
-figure
-tiledlayout(2,1);
-nexttile
-mag_ad =  20*log10(abs(admittance))
-
-[pks1 ind1] = findpeaks(phase_ad1,'MinPeakDistance',5,'MinPeakProminence',10);
-
-
-plot(w/(2*pi*10^6),mag_ad,'b'); hold on; plot(w(ind1)/(2*pi*10^6),mag_ad(ind1),'or'); title('Frequency response of the admittance'); ...
- xlabel('Frequency [MHz]'); ylabel('magnitude [DB]'); legend('Theoretical system admittance');
-ylim([-100 -65])
-nexttile
-plot(w/(2*pi*10^6),-phase_ad1,'b'); hold on; plot(w(ind1)/(2*pi*10^6),-phase_ad1(ind1),'or'); xlabel('Frequency [MHz]'); ylabel('Phase [deg]'); legend('Theoretical system admittance phase');
-ylim([70 95]);
+% admittance = 1./Z_Ae_in;
+% phase_ad1 = rad2deg(angle(admittance));
+% mag_ad = 20*log10(abs(admittance));
+% 
+% figure
+% tiledlayout(2,1);
+% nexttile
+% mag_ad =  20*log10(abs(admittance))
+% plot(w/(2*pi*10^-6),mag_ad,'g');title('Bode magnitude plot of the admittance'); ...
+%     xlabel('Frequency [MHz]'); ylabel('magnitude [DB]');
+% ylim([-100 -50])
+% nexttile
+% plot(w/(2*pi*10^6),phase_ad1);xlabel('Frequency [MHz]'); ylabel('Phase [deg]')
+% 
 % 
 % M = readmatrix('C:\Users\wneum\OneDrive - Universiteit Twente\Desktop\project\FreqSweepSkabelon.xlsx')
 % 
